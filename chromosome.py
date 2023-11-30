@@ -1,16 +1,6 @@
 #chromsome interpretation
 
-def checkConditional(conditional_index):
-	speed = 10 # TODO :  Make real speed later # true
-	enemy_dist = 50 # true
-	wall_dist = 300 # false
-	bulletDanger = 200 #false
-	conditional_list = ["speed > 6", "enemy_dist < 100", "wall_dist < 200", "bulletDanger < 50"]
-	
-	result = eval(conditional_list[conditional_index])
-	#print(conditional_list[conditional_index])
-	#print(result)
-	return result
+
 
 # 16 loops -> big actions (states) referred to as chrome
 # Each loop has 8 genes (instructions/jump/action) referred to as gene
@@ -34,11 +24,7 @@ def readChrome(chrome):
 				
 				loop.append([False, conditional_index, loop_number])
 				
-				if checkConditional(conditional_index):
-					# gene = chrome[conditional_index]
-					# TODO GoTo loop_number
-					pass
-					#print("Loop num: {}".format(loop_number))
+				
 				
 				#print("Conditional loop: {}".format(conditional_index))
 				#print("Loop number: {}".format(loop_number))
@@ -59,11 +45,15 @@ def readChrome(chrome):
 		loops.append(loop)
 
 	return loops
-gene = [['100001111', '001111001', '010101101', '100111000']]
-chromosome = [['100001111', '001111001', '010101101', '100111000'], ['001111001']]
-print(readChrome(chromosome))
+#gene = [['100001111', '001111001', '010101101', '100111000']]
+#chromosome = [['100001111', '001111001', '010101101', '100111000'], ['001111001']]
+#print(readChrome(chromosome))
 
 
-	
+#if checkConditional(conditional_index):
+					# gene = chrome[conditional_index]
+					# TODO GoTo loop_number
+					#pass
+					#print("Loop num: {}".format(loop_number))
 
 
