@@ -177,13 +177,13 @@ def AI_loop():
 				break # TODO - does this work?
 			else:
 				# do actions
+				pass
 		
 
 	except Exception as e:
 		print("Exception")
 		print(e)
 		ai.quitAI()
-		
 # Chomosome Controllers! #[[loop1], [loop2]]
 chrome =  [['000001111', '101111001', '110101101', '100111000'], ['001111001', '100111000']]
 raw_chrome_values = readChrome(chrome)
