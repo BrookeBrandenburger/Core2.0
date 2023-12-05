@@ -20,7 +20,6 @@ def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and 
     return theta
     
 def checkConditional(conditional_index, sensors):
-	print(sensors)
 	speed = sensors[0]
 	enemy_dist = sensors[1]
 	wall_dist= sensors[2]
@@ -90,6 +89,7 @@ def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y):
 
 def AI_loop():
 	try:
+			
 		#speed = sensors[0]
 		#enemy_dist = sensors[1]
 		#wall_dist= sensors[2] # minimum wall distance
@@ -171,19 +171,21 @@ def AI_loop():
         
 		sensors = [speed, ENEMY_DIST, wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
 		
-		checkConditional(1, sensors) # TODO Del
-		exit() # TODO Del
+		if current_chrome[0][0] == False: # jump gene
+			if checkConditional(current_chrome[0][1], sensors): # TODO Del
+				current_chrome = raw_chrome_values[current_chrome[0][2]]
+				break # TODO - does this work?
+			else:
+				# do actions
 		
-		if checkConditional(conditional_index, sensors):
-			# gene = chrome[conditional_index]
-			# TODO GoTo loop_number
-			pass
-			#print("Loop num: {}".format(loop_number))
 
 	except Exception as e:
 		print("Exception")
 		print(e)
 		ai.quitAI()
-
-
+		
+# Chomosome Controllers! #[[loop1], [loop2]]
+chrome =  [['000001111', '101111001', '110101101', '100111000'], ['001111001', '100111000']]
+raw_chrome_values = readChrome(chrome)
+current_chrome = raw_chrome_values[0]
 ai.start(AI_loop, ["-name", "Core!", "-join", "localhost"])

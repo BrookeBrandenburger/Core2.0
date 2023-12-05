@@ -46,8 +46,8 @@ def readChrome(chrome):
 
 	return loops
 #gene = [['100001111', '001111001', '010101101', '100111000']]
-#chromosome = [['100001111', '001111001', '010101101', '100111000'], ['001111001']]
-#print(readChrome(chromosome))
+chromosome = [['100001111', '001111001', '010101101', '100111000'], ['001111001', '100111000']]
+print(readChrome(chromosome))
 
 
 #if checkConditional(conditional_index):
