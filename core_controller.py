@@ -173,12 +173,13 @@ def AI_loop():
         global current_gene
         global current_loop_idx
 
-        print("Chrome: {}".format(chrome))
-        print("Raw chrome values: {}".format(raw_chrome_values))
+        #print("Chrome: {}".format(chrome))
+        #print("Raw chrome values: {}".format(raw_chrome_values))
         print("Current gene: {}".format(current_gene))
         print("Current loop: {}".format(current_gene[current_loop_idx]))
+        print("Current loop index: {}".format(current_loop_idx))
         print("-"*20)
-
+        print("Size of current gene: {}".format(len(current_gene)))
         sensors = [speed, ENEMY_DIST, wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
 
         # If current gene is a jump gene
@@ -195,7 +196,7 @@ def AI_loop():
 
                 print("Jumping to: {}".format(current_gene_idx))
             else:
-                current_loop_idx = ((current_loop_idx + 1) % 16) # Move to next loop in the gene (max 15)
+                current_loop_idx = ((current_loop_idx + 1) % 9) # Move to next loop in the gene (max 15)
         else: 
             # Convert from boolean to 1 or 0 for x-pilot inputs
             shoot = current_gene[current_loop_idx][1] 
@@ -223,6 +224,7 @@ def AI_loop():
                 case 1:
                     pass
                 case 2:
+                    ai.turnRight(1) # Place holder
                     pass
                 case 3:
                     pass
@@ -234,7 +236,7 @@ def AI_loop():
                     pass
                 case 7:
                     pass
-            current_loop_idx = ((current_loop_idx + 1) % 16) # Move to next loop in the gene (max 15)
+            current_loop_idx = ((current_loop_idx + 1) % 9) # Move to next loop in the gene (max 15)
  
 
             
@@ -252,7 +254,8 @@ def main():
     global current_gene_idx
     global current_loop_idx
 
-    raw_chrome_values =  [['100001110', '001111001', '010101101', '000111000'], ['101111001', '000111000']]
+    raw_chrome_values = [['101100000', '010111100', '010010001', '000111100', '010111111', '011011010', '011011110', '010001011', '010110011'], ['101000100', '000000110', '011001101', '001100001', '001111010', '010101101', '000100101', '010100001', '011111111'], ['101101101', '011111101', '000000000', '010001101', '010010000', '011111111', '011001010', '011100011', '000011000'], ['101011001', '001110001', '010111010', '011110110', '001111101', '010011000', '001000110', '010011001', '011100111'], ['100011011', '010001100', '001010001', '010101110', '000011101', '011110000', '010111100', '010001101', '000011000'], ['110101101', '000111110', '000010111', '011100110', '001100111', '000000110', '000100111', '011000011', '010011110'], ['110000011', '010110011', '011001101', '000100000', '010110010', '010000000', '000010100', '001100000', '001000011'], ['100010111', '010001000', '010011010', '011010100', '000111001', '000011000', '010101010', '000100000', '000011111'], ['110010111', '001100000', '001100001', '000110111', '001110000', '001010110', '010100000', '011110101', '011100010'], ['101100111', '010010011', '000110110', '000011110', '010100100', '010011111', '010011010', '011011100', '010001001'], ['101100011', '000100100', '011101001', '011000101', '011011010', '000101100', '000000111', '010110100', '010000010'], ['101011011', '000000101', '000001011', '010101100', '001110110', '000100010', '011101100', '001010110', '011111110'], ['110010101', '010010101', '000101011', '011101111', '000100000', '010111110', '001001101', '011010001', '001100100'], ['100001011', '011001111', '001000111', '010010111', '000011100', '000000011', '001100110', '000011010', '011100001'], ['100011111', '011111101', '000111010', '000001010', '001000111', '011110001', '001101001', '001001110', '010110011'], ['100000111', '001000001', '010011110', '010101110', '010011010', '011100011', '000111110', '001111100', '010000100']]
+
     chrome = readChrome(raw_chrome_values)
     current_gene_idx = 0 # Gene refers to loop index
     current_gene = chrome[current_gene_idx]
