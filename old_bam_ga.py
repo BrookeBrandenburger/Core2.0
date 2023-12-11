@@ -366,10 +366,7 @@ def AI_loop():
         ai.turnLeft(0)
         ai.turnRight(0)
         speedLimit = 7 # 7
-        # distance for close object (distance units) Best chromosome: [0	1	0	0	1	1	0	0	1	1	0	1	1	1	0	 0]
 
-        #gene: list[int] = [0, 1, 0, 0, 1, 1, 0, 0, 1, 1,0, 1, 1,1, 0, 0]
-        gene = [0, 1,0,0,1,1,0,0,1,1,0,1,1,1,0,0]
 
         nearDanger = P.convertToNum(gene[:8]) # Value to train GA
         # distance for close bullets (distance units)
