@@ -89,7 +89,6 @@ def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y):
 
 def AI_loop():
     try:
-            
         #speed = sensors[0]
         #enemy_dist = sensors[1]
         #wall_dist= sensors[2] # minimum wall distance
@@ -168,24 +167,98 @@ def AI_loop():
         feelers.append(slightLeft)
         
         wall_dist = min(feelers)
-        
+
+        global current_gene_idx
+        global chrome
+        global current_gene
+        global current_loop_idx
+
+        print("Chrome: {}".format(chrome))
+        print("Raw chrome values: {}".format(raw_chrome_values))
+        print("Current gene: {}".format(current_gene))
+        print("Current loop: {}".format(current_gene[current_loop_idx]))
+        print("-"*20)
+
         sensors = [speed, ENEMY_DIST, wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
-        
-        if current_chrome[0][0] == False: # jump gene
-            if checkConditional(current_chrome[0][1], sensors): # TODO Del
-                current_chrome = raw_chrome_values[current_chrome[0][2]]
-                pass # TODO - does this work?
+
+        # If current gene is a jump gene
+        if current_gene[current_loop_idx][0] == False:
+            print("Jump Gene!")
+
+            # If the Jump Gene conditional is true
+            checkConditionalResult = checkConditional(current_gene[current_loop_idx][1], sensors)
+            print(checkConditionalResult)
+            if checkConditionalResult:
+                current_gene_idx = current_gene[current_loop_idx][2] # Update to the gene determined by jump 
+                current_gene = chrome[current_gene_idx] # Set new current gene based on the index
+                current_loop_idx = 0 # Reset loop index to 0 for the new gene
+
+                print("Jumping to: {}".format(current_gene_idx))
             else:
-                # do actions
-                pass
-        
+                current_loop_idx = ((current_loop_idx + 1) % 16) # Move to next loop in the gene (max 15)
+        else: 
+            # Convert from boolean to 1 or 0 for x-pilot inputs
+            shoot = current_gene[current_loop_idx][1] 
+            thrust = 1 if current_gene[current_loop_idx][2] else 0
+            
+            turnQuantity = current_gene[current_loop_idx][3]
+            turnTarget = current_gene[current_loop_idx][4]
+            
+            print("Action Gene:")
+            print("Shoot: {}".format(shoot))
+            print("Thrust: {}".format(thrust))
+            print("Turn Quantity: {}".format(turnQuantity))
+            print("Turn Target Num: {}".format(turnTarget))
+            print("-"*20)
+
+            ai.thrust(thrust)
+            ai.fireShot() if shoot else None #ai.fireShot(shoot) # Shoot if shoot is true
+          
+            # Pick turn target based on numerical identifier from loop.
+            #Examples from paper: nearestShip, oppsoiteClosestWall, most dangerous bullet etc
+            # TODO: Implement turning target and utilize turn quantity
+            match turnTarget:
+                case 0:
+                    pass
+                case 1:
+                    pass
+                case 2:
+                    pass
+                case 3:
+                    pass
+                case 4:
+                    pass
+                case 5:
+                    pass
+                case 6:
+                    pass
+                case 7:
+                    pass
+            current_loop_idx = ((current_loop_idx + 1) % 16) # Move to next loop in the gene (max 15)
+ 
+
+            
 
     except Exception as e:
         print("Exception")
         print(e)
         ai.quitAI()
-# Chomosome Controllers! #[[loop1], [loop2]]
-chrome =  [['000001111', '101111001', '110101101', '100111000'], ['001111001', '100111000']]
-raw_chrome_values = readChrome(chrome)
-current_chrome = raw_chrome_values[0]
-ai.start(AI_loop, ["-name", "Core!", "-join", "localhost"])
+
+def main():
+    # Chomosome Controllers! #[[loop1], [loop2]]
+    global chrome
+    global raw_chrome_values
+    global current_gene
+    global current_gene_idx
+    global current_loop_idx
+
+    raw_chrome_values =  [['100001110', '001111001', '010101101', '000111000'], ['101111001', '000111000']]
+    chrome = readChrome(raw_chrome_values)
+    current_gene_idx = 0 # Gene refers to loop index
+    current_gene = chrome[current_gene_idx]
+    current_loop_idx = 0 # 
+
+    ai.start(AI_loop, ["-name", "Core!", "-join", "localhost"])
+
+if __name__ =="__main__":
+    main()

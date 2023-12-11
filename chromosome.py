@@ -21,7 +21,7 @@ def readChrome(chrome):
 				conditional_index = int(instruction_gene[1:5], 2)
 				loop_number = int(instruction_gene[5:], 2)
 				
-				
+			    # Structure: False, conditional index, jump to num	
 				loop.append([False, conditional_index, loop_number])
 				
 				
@@ -46,7 +46,7 @@ def readChrome(chrome):
 
 	return loops
 #gene = [['100001111', '001111001', '010101101', '100111000']]
-chromosome = [['100001111', '001111001', '010101101', '100111000'], ['001111001', '100111000']]
+chromosome = [['100001111', '001111001', '010101101', '000111000'], ['101111001', '000111000']]
 print(readChrome(chromosome))
 
 
