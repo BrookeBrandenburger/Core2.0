@@ -47,6 +47,8 @@ def readChrome(chrome):
 #chromosome = [['100001111', '001111001', '010101101', '000111000'], ['101111001', '000111000']]
 #print(readChrome(chromosome))
 
+
+# TODO : Add set conditional numbers
 def generateChromosome():
     # Gene Size 9 bits
     # Loop size including conditional 8
@@ -64,6 +66,13 @@ def generateChromosome():
                     gene += str(random.randint(0, 1))
             loop.append(gene)
         chromosome.append(loop)
-    print(chromosome)
+    #print(chromosome)
     return chromosome
-generateChromosome()
+#generateChromosome()
+
+
+def writeChromosomeToFile(chromosome, filename):
+    with open(filename, "w") as file:
+         #for loop in chromosome:
+            #for gene in loop:
+        file.write(str(chromosome))
