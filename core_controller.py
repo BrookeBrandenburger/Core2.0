@@ -101,10 +101,6 @@ def AI_loop():
         
         # Self details
         # handicap
-        ai.setTurnSpeedDeg(20)
-        power = 20
-        ai.setPower(power)
-        
         speed = int(ai.selfSpeed())
         X = int(ai.selfX())
         Y = int(ai.selfY())
