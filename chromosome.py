@@ -47,13 +47,13 @@ def readChrome(chrome):
 #chromosome = [['100001111', '001111001', '010101101', '000111000'], ['101111001', '000111000']]
 #print(readChrome(chromosome))
 
-def generateChromosomes(num=16):
+def generateChromosome():
     # Gene Size 9 bits
-    # Loop size including conditional is 9 - # TODO Paper uses 8 for loop size, does this matter?
-    shell = []
-    for i in range(num):
-        chromosome = []
-        for i in range(9): # 8 genes per loop
+    # Loop size including conditional 8
+    chromosome = []
+    for loop in range(16):
+        loop = []
+        for i in range(8): # 8 genes per loop
             gene = ""
             for j in range(9): # gene size
                 if i == 0 and j==0: 
@@ -62,8 +62,8 @@ def generateChromosomes(num=16):
                     gene += "0"
                 else: 
                     gene += str(random.randint(0, 1))
-            chromosome.append(gene)
-        shell.append(chromosome)
-    print(shell)
-    return shell
-generateChromosomes()
+            loop.append(gene)
+        chromosome.append(loop)
+    print(chromosome)
+    return chromosome
+generateChromosome()
