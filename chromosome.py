@@ -9,21 +9,21 @@ import shutil
 
 # Mutation function based on a given chromosome and mutation rate
 def mutate(chromosome, MUT_RATE):
-    new_chromosome = []
-    for geneIndex in range(len(chromosome)):
-        gene = []
 
-        for actionIndex in range(len(chromosome[geneIndex])):
-            action = ""
-            for bit in chromosome[geneIndex][actionIndex]:
-                print(bit)
-                if 1 == random.randint(0, MUT_RATE): # Mutate Time!
-                    print("flip!")
+    new_chromosome = [] # Full chromosome
+    for loopIndex in range(len(chromosome)):
+        loop = [] #Loop containing 16 genes
+
+        for geneIndex in range(len(chromosome[loopIndex])):
+
+            gene = "" # A 9 bit representation of a jump or action gene
+            for bit in chromosome[loopIndex][geneIndex]:
+                if 0 == random.randint(0, MUT_RATE): # Mutate Time!
                     # Replaces 1 with 0 or 0 with 1
                     bit = '1' if bit == '0' else '0'
-                action += bit
-            gene.append(action)
-        new_chromosome.append(gene)
+                gene += bit
+            loop.append(gene)
+        new_chromosome.append(loop)
     
     return new_chromosome
 
