@@ -263,6 +263,11 @@ def AI_loop():
         
         wall_dist = min(feelers)
 
+        # Disable turns by default each loop
+        ai.turnRight(0)
+        ai.turnRight(0)
+
+    
         global current_loop_idx
         global chrome # Decoded chromosome
         global current_loop
