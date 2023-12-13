@@ -20,12 +20,12 @@ def initializeAgent(input_chrome = generateChromosome()):
     global framesPostDeath
 
     framesPostDeath = 0
-    prev_score = 0
-    score = 0
+    #prev_score = 0
+    #score = 0
 
     chromosome = input_chrome
-    #writeChromosomeToFile(chromosome, "output_chromosome.txt")#Can call whatever 
     chrome = readChrome(chromosome)
+    print("Chromosome: {}".format(chromosome))
     current_loop_idx = 0 # Current Loop Number
     current_loop = chrome[current_loop_idx]
     current_gene_idx = 0 # Current gene Number within a given loop
@@ -54,17 +54,22 @@ def died(ai):
     global framesPostDeath
 
     # Start frame counter
-    if score != prev_score:
+    if score < prev_score:
         framesPostDeath = 1
+        print("Score: {}".format(score))
+        print("Previous Score: {}".format(prev_score))
 
-    if framesPostDeath >= 1:
+    if framesPostDeath >= 1 and framesPostDeath < 100:
         framesPostDeath += 1
-
+    else:
+        framesPostDeath = 0
+    print("Frames post Death: {}".format(framesPostDeath))
     # Score change and message with hyphen (indicating killed instead of wall collision)
-    if (framesPostDeath > 0 and framesPostDeath < 100): 
+    if (framesPostDeath != 0): 
         message = ai.scanMsg(0)
         
         if "-" in message:
+            framesPostDeath = 0
             print("Message: {}".format(message))
 
             if len(message) > 1:
@@ -77,8 +82,6 @@ def died(ai):
                 new_chromosome = None
                 with open(new_chromosome_file_name, 'r') as f:
                     new_chromosome = eval(f.read())
-                    
-                framesPostDeath = 0 # Reset Frames Post Death
 
                 initializeAgent(new_chromosome)
 
@@ -316,12 +319,16 @@ def AI_loop():
         # Kill/Death Tracking
         global score
         global prev_score
-        earnedKill(ai) # Check for kill
-        died(ai) # If killed, get new chromosome
 
-        # NOTE: Do we want to crossover with a random new chroomsome if we crash ourselves?
+        earnedKill(ai)
+        died(ai)
         prev_score = score
         score = ai.selfScore()
+
+        #print("Main Loop Score: {}".format(score))
+        #print("Main Loop Prev_Score: {}".format(score))
+
+        # NOTE: Do we want to crossover with a random new chroomsome if we crash ourselves?
 
 
 
@@ -333,6 +340,12 @@ def AI_loop():
 def main():
     createDataFolder()
     initializeAgent()
+    global prev_score
+    global score
+    
+    score = 0
+    prev_score = 0
+
 
     ai.start(AI_loop, ["-name", "Core!", "-join", "localhost"])
 
