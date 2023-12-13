@@ -1,11 +1,7 @@
 import libpyAI as ai
 import math
 import random
-import csv
-from numpy.random import randint
 import random
-import os
-import shutil
 
 from chromosome import *
 
