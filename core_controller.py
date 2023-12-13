@@ -90,12 +90,17 @@ def died(ai):
                 with open(new_chromosome_file_name, 'r') as f:
                     new_chromosome = eval(f.read())
 
-                # TODO : Crossover/mutation functions here
+                # Evolution
                 #print("Transferred Chrome: {}".format(new_chromosome))
                 cross_over_child = crossover(chromosome, new_chromosome)
                 #print("Crossover child: {}".format(cross_over_child))
                 mutated_child = mutate(cross_over_child, MUT_RATE)
                 #print("Mutated child: {}".format(mutated_child))
+                
+                ## Check that the new chromosome is different than old, insanely low odds for it to be the same
+                #print("*"*50)
+                #print(mutated_child == chromosome)
+                #print("*"*50)
 
                 initializeAgent(mutated_child) # Set new chromosome in place of old
 
