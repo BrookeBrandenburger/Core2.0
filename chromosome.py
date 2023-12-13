@@ -7,6 +7,27 @@ import os
 from os.path import exists
 import shutil
 
+# Mutation function based on a given chromosome and mutation rate
+def mutate(chromosome, MUT_RATE):
+    new_chromosome = []
+    for geneIndex in range(len(chromosome)):
+        gene = []
+
+        for actionIndex in range(len(chromosome[geneIndex])):
+            action = ""
+            for bit in chromosome[geneIndex][actionIndex]:
+                print(bit)
+                if 1 == random.randint(0, MUT_RATE): # Mutate Time!
+                    print("flip!")
+                    # Replaces 1 with 0 or 0 with 1
+                    bit = '1' if bit == '0' else '0'
+                action += bit
+            gene.append(action)
+        new_chromosome.append(gene)
+    
+    return new_chromosome
+
+
 def readChrome(chrome):
 	loops = []
 	for gene in chrome:
