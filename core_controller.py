@@ -139,7 +139,7 @@ def checkConditional(conditional_index, sensors):
                         "enemy_dist < 100 and enemy_dir == 2", 
                         #"True",
                         "enemy_dist < 100 and enemy_dir == 3",
-                        "enemy_dist < 100 and enemy_dir == 4"
+                        "enemy_dist < 100 and enemy_dir == 4",
                          "wall_dist < 200", "wall_dist < 75", "wall_dist > 200" , "wall_dist < 150",
                         "closestBulletDistance < 100", "closestBulletDistance < 200", "closestBulletDistance <50",
                         "enemy_dist == -1"
