@@ -27,7 +27,7 @@ def crossover(chromosome1, chromosome2):
         if random.randint(0, 1) == 1: # Randomly select a child to return
             return child1
         else:
-            return child2
+            return child2 
         # TODO ? Do we just select one for our new agent?
 
     elif chances == 0: # Uniform crossover
@@ -53,7 +53,7 @@ def crossover(chromosome1, chromosome2):
                 loop.append(gene)
             new_chromosome.append(loop)
         
-        print("Uniform Crossover Child: {}".format(new_chromosome))
+        #print("Uniform Crossover Child: {}".format(new_chromosome))
         return new_chromosome
 
     else:
