@@ -7,6 +7,7 @@ from os import path
 
 from chromosome import *
 
+# Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
 def initializeAgent(input_chrome = generateChromosome()):
     # Chomosome Controllers! #[[loop1], [loop2]]
     global chrome # Decoded chromosome
@@ -17,11 +18,9 @@ def initializeAgent(input_chrome = generateChromosome()):
     global chromosome
     global prev_score
     global score
-    global framesPostDeath
+    global framesPostDeath # 
 
     framesPostDeath = 0
-    #prev_score = 0
-    #score = 0
 
     chromosome = input_chrome
     chrome = readChrome(chromosome)
@@ -30,13 +29,15 @@ def initializeAgent(input_chrome = generateChromosome()):
     current_loop = chrome[current_loop_idx]
     current_gene_idx = 0 # Current gene Number within a given loop
 
+# Checks if a kill has been made, if yes -> write it to file and send the file name to chat
 def earnedKill(ai):
     global score
     global prev_score
     global chromosome
    
-    filename = "selChrome_0.txt"
+    filename = "selChrome_0.txt" #Baseline file name
 
+    # Modify file ending for pre-existing files
     while os.path.exists(("data/" + filename)):
         index = int((filename.split("_")[1]).split(".")[0]) # Get the number at end of file name
         index = str(index+1)
@@ -44,8 +45,11 @@ def earnedKill(ai):
 
     # Score increment indicates a kill
     if score > prev_score:
-        writeChromosomeToFile(chromosome, filename)
-        ai.talk('New Chrome File -' + filename)
+        writeChromosomeToFile(chromosome, filename) 
+        ai.talk('New Chrome File -' + filename) #Chat the file name
+
+# Checks if the agent has died, if yes and it was killed by another agent
+# finds the chromosome file, and initalizes it as its new chromosome
 
 def died(ai):
     global score
@@ -53,7 +57,7 @@ def died(ai):
     global chromosome
     global framesPostDeath
 
-    # Start frame counter
+    # Start frame counter after a negative score change
     if score < prev_score:
         framesPostDeath = 1
         print("Score: {}".format(score))
@@ -64,17 +68,17 @@ def died(ai):
     else:
         framesPostDeath = 0
     print("Frames post Death: {}".format(framesPostDeath))
+
     # Score change and message with hyphen (indicating killed instead of wall collision)
     if (framesPostDeath != 0): 
-        message = ai.scanMsg(0)
+        message = ai.scanMsg(0) # Get most recent chat message
         
-        if "-" in message:
+        if "-" in message: # Hyphen is only in our file messages from other agents
             framesPostDeath = 0
             print("Message: {}".format(message))
 
             if len(message) > 1:
                 print("Death and death message found")
-                #print(message)
                 message = (message.split("-")[1]).split(" ")[0] # Extract filename from message
                 print("New Chrome filepath: {}".format(message))
                 new_chromosome_file_name = "data/" + message
@@ -83,7 +87,10 @@ def died(ai):
                 with open(new_chromosome_file_name, 'r') as f:
                     new_chromosome = eval(f.read())
 
-                initializeAgent(new_chromosome)
+                # TODO : Crossover/mutation functions here
+                # TODO
+                # TODO
+                initializeAgent(new_chromosome) # Set new chromosome in place of old
 
 
 
