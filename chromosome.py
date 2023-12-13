@@ -3,6 +3,9 @@
 # Each loop has 8 genes (instructions/jump/action) referred to as gene
 # Conditionals jump to other states
 import random
+import os
+from os.path import exists
+import shutil
 
 def readChrome(chrome):
 	loops = []
@@ -72,7 +75,19 @@ def generateChromosome():
 
 
 def writeChromosomeToFile(chromosome, filename):
-    with open(filename, "w") as file:
+    dataPath = "data/" + filename
+    print(dataPath)
+    print(os.path.exists(dataPath))
+    with open(dataPath, "w") as file:
          #for loop in chromosome:
             #for gene in loop:
         file.write(str(chromosome))
+
+def createDataFolder():
+	# Data folder
+    try:
+        shutil.rmtree("data/")
+    except:
+        pass
+        
+    os.mkdir("data/")
