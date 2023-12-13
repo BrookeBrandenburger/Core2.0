@@ -314,8 +314,15 @@ def AI_loop():
                 #turn away from closest wall heading
                     pass
                 case 4:
-                #turn towards enemy ship 
-                    pass
+                #turn towards enemy ship
+                    if ENEMY_DIST != None:
+                        angle = findAngle(X, ENEMY_X, EMENY_DIST)
+                        
+                        
+                        ahi.turn(turnQuantity)
+                    
+                        
+                    
                 case 5:
                 #turn away from enemy ship
                     #ai.turnLeft(1)
