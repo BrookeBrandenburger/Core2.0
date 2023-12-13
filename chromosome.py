@@ -136,12 +136,12 @@ def generateChromosome():
         for i in range(8): # 8 genes per loop
             gene = ""
             for j in range(9): # gene size
-                if i == 0 and j==0: 
-                    gene += "1" 
-                elif j == 0 :
-                    gene += "0"
-                else: 
-                    gene += str(random.randint(0, 1))
+                #if i == 0 and j==0: 
+                #    gene += "1" 
+                #elif j == 0 :
+                #    gene += "0"
+                #else: 
+                gene += str(random.randint(0, 1))
             loop.append(gene)
         chromosome.append(loop)
     #print(chromosome)
