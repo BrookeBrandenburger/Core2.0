@@ -318,17 +318,20 @@ def AI_loop():
                 case 0:
                     pass
                 case 1:
+                    #ai.turnLeft(1)
                     pass
                 case 2:
-                    ai.turnRight(1) # Place holder
+                    #ai.turnRight(1) # Place holder
                     pass
                 case 3:
                     pass
                 case 4:
                     pass
                 case 5:
+                    #ai.turnLeft(1)
                     pass
                 case 6:
+                    ai.turnRight(1)
                     pass
                 case 7:
                     pass
