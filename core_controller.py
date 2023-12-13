@@ -280,7 +280,7 @@ def AI_loop():
         sensors = [speed, ENEMY_DIST, wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
 
         # If current gene is a jump gene
-        if current_loop[current_gene_idx][0] == False:
+        if current_loop[current_gene_idx][0] == False: # First item in gene being false indicates jump gene
 
             # If the Jump Gene conditional is true
             checkConditionalResult = checkConditional(current_loop[current_gene_idx][1], sensors)
