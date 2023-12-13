@@ -85,6 +85,24 @@ def AI_loop():
         prev_score = score
         score = ai.selfScore()
 
+        closestShipId = int(ai.closestShipId())
+
+        ENEMY_SPEED = None
+        ENEMY_DIST = None
+        ENEMY_X = None
+        ENEMY_Y = None
+        ENEMY_HEADING = None
+
+        if closestShipId != -1:
+            ENEMY_SPEED = float(ai.enemySpeedId(closestShipId))
+            ENEMY_DIST = float(ai.enemyDistanceId(closestShipId))
+            ENEMY_X = int(ai.screenEnemyXId(closestShipId))
+            ENEMY_Y = int(ai.screenEnemyYId(closestShipId))
+            ENEMY_HEADING = float(ai.enemyHeadingDegId(closestShipId))
+
+        print("Enemy_X: {}".format(ENEMY_X))
+        print("Enemy_Y: {}".format(ENEMY_Y))
+
 
 
     except Exception as e:
