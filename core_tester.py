@@ -7,6 +7,16 @@ from os import path
 
 from chromosome import *
 
+def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and enemy
+    hyp = ENEMY_DIST
+    if ENEMY_X - X > 0:
+        x_dist = ENEMY_X - X
+    else:
+        x_dist = X - ENEMY_X
+    theta = int(math.degrees(math.acos(x_dist / hyp))) - 90
+
+    return theta
+
 def initializeAgent(input_chrome = generateChromosome()):
     # Chomosome Controllers! #[[loop1], [loop2]]
     global chrome # Decoded chromosome
@@ -86,7 +96,7 @@ def AI_loop():
         score = ai.selfScore()
 
         closestShipId = int(ai.closestShipId())
-
+        X = ai.selfX()
         ENEMY_SPEED = None
         ENEMY_DIST = None
         ENEMY_X = None
@@ -102,6 +112,9 @@ def AI_loop():
 
         print("Enemy_X: {}".format(ENEMY_X))
         print("Enemy_Y: {}".format(ENEMY_Y))
+
+        if ENEMY_DIST != None:
+            print("Theta: {}".format(findAngle(X, ENEMY_X, ENEMY_DIST)))
 
 
 

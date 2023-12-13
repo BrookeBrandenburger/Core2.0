@@ -113,7 +113,7 @@ def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and 
         x_dist = ENEMY_X - X
     else:
         x_dist = X - ENEMY_X
-    theta = int(math.degrees(math.acos(x_dist / hyp)))
+    theta = int(math.degrees(math.acos(x_dist / hyp))) - 90
 
     return theta
     
