@@ -17,7 +17,9 @@ def initializeAgent(input_chrome = generateChromosome()):
     global chromosome
     global prev_score
     global score
+    global framesPostDeath
 
+    framesPostDeath = 0
     prev_score = 0
     score = 0
 
@@ -34,38 +36,52 @@ def earnedKill(ai):
     global chromosome
    
     filename = "selChrome_0.txt"
-    filepath = "data/" + filename
 
-    while os.path.exists((filepath)):
+    while os.path.exists(("data/" + filename)):
         index = int((filename.split("_")[1]).split(".")[0]) # Get the number at end of file name
         index = str(index+1)
         filename = "selChrome_{}.txt".format(index)
-        filepath = "dara/" + filename
 
-    # TODO
     # Score increment indicates a kill
     if score > prev_score:
-        writeChromosomeToFile(chromosome, filepath)
+        writeChromosomeToFile(chromosome, filename)
         ai.talk('New Chrome File -' + filename)
 
 def died(ai):
     global score
     global prev_score
     global chromosome
-    
-    message = (ai.scanMsg(0)+ " -test.txt").split("-")
+    global framesPostDeath
+
+    # Start frame counter
+    if score != prev_score:
+        framesPostDeath = 1
+
+    if framesPostDeath >= 1:
+        framesPostDeath += 1
+
     # Score change and message with hyphen (indicating killed instead of wall collision)
-    if score != prev_score: 
-        if len(message) > 1:
-            print("Death and death message found")
-            print(message)
-            new_chromosome_file_name = "data/" + str(message[1])
+    if (framesPostDeath > 0 and framesPostDeath < 100): 
+        message = ai.scanMsg(0)
+        
+        if "-" in message:
+            print("Message: {}".format(message))
 
-            new_chromosome = None
-            with open(new_chromosome_file_name, 'r') as f:
-                new_chromosome = eval(f.read())
+            if len(message) > 1:
+                print("Death and death message found")
+                #print(message)
+                message = (message.split("-")[1]).split(" ")[0] # Extract filename from message
+                print("New Chrome filepath: {}".format(message))
+                new_chromosome_file_name = "data/" + message
+               
+                new_chromosome = None
+                with open(new_chromosome_file_name, 'r') as f:
+                    new_chromosome = eval(f.read())
+                    
+                framesPostDeath = 0 # Reset Frames Post Death
 
-            initializeAgent(new_chromosome)
+                initializeAgent(new_chromosome)
+
 
 
 def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and enemy
@@ -229,9 +245,9 @@ def AI_loop():
         global current_loop
         global current_gene_idx
         global chromosome
-	    
+        
         GENES_PER_LOOP = 8
-	
+    
         #print("Chrome: {}".format(chrome))
         #print("Raw chrome values: {}".format(raw_chrome_values))
         print("Current gene: {}".format(current_loop))
