@@ -4,6 +4,7 @@ import random
 import random
 import os 
 from os import path
+import sys
 
 from chromosome import *
 
@@ -357,7 +358,12 @@ def AI_loop():
         ai.quitAI()
 
 def main():
+    args = sys.argv
+    bot_num = sys.argv[1]
+
     createDataFolder()
+
+
     initializeAgent()
     global prev_score
     global score
@@ -366,8 +372,7 @@ def main():
     prev_score = 0
 
 
-    ai.start(AI_loop, ["-name", "Core!", "-join", "localhost"])
-
+    ai.start(AI_loop, ["-name", "Core Agent {}".format(bot_num), "-join", "localhost"])
 
 if __name__ =="__main__":
     main()
