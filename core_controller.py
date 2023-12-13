@@ -56,6 +56,9 @@ def died(ai):
     global prev_score
     global chromosome
     global framesPostDeath
+    global MUT_RATE
+
+    MUT_RATE = 300
 
     # Start frame counter after a negative score change
     if score < prev_score:
@@ -88,9 +91,13 @@ def died(ai):
                     new_chromosome = eval(f.read())
 
                 # TODO : Crossover/mutation functions here
-                # TODO
-                # TODO
-                initializeAgent(new_chromosome) # Set new chromosome in place of old
+                #print("Transferred Chrome: {}".format(new_chromosome))
+                cross_over_child = crossover(chromosome, new_chromosome)
+                #print("Crossover child: {}".format(cross_over_child))
+                mutated_child = mutate(cross_over_child, MUT_RATE)
+                #print("Mutated child: {}".format(mutated_child))
+
+                initializeAgent(mutated_child) # Set new chromosome in place of old
 
 
 
@@ -341,7 +348,7 @@ def AI_loop():
 
     except Exception as e:
         print("Exception")
-        print(e)
+        print(str(e))
         ai.quitAI()
 
 def main():
