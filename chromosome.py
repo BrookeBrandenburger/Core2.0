@@ -140,8 +140,8 @@ def generateChromosome():
                 #    gene += "1" 
                 #elif j == 0 :
                 #    gene += "0"
-                else: 
-                    gene += str(random.randint(0, 1))
+                #else: 
+                gene += str(random.randint(0, 1))
             loop.append(gene)
         chromosome.append(loop)
     #print(chromosome)
