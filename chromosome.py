@@ -7,6 +7,38 @@ import os
 from os.path import exists
 import shutil
 
+def crossover(chromosome1, chromosome2):
+    chances = random.randint(0, 1) # Equal opprotunity for single point or uniform crossover
+    chances = 1 # TODO : DEL
+
+    # TODO : Not functional
+    if chances == 1: # Single Point Crossover
+        splicePoint = random.randint(1, len(chromosome1))
+        print(splicePoint)
+        chrome1_X = chromosome1[0:splicePoint]
+        chrome1_Y = chromosome1[splicePoint:]
+        print(chrome1_X)
+        chrome2_X = chromosome2[0:splicePoint]
+        chrome2_Y = chromosome2[splicePoint:]
+
+        child1 = chrome1_X.append(chrome2_Y)
+        child2 = chrome1_Y.append(chrome2_X)
+        print(child1)
+        print(child2)
+        if random.randint(0, 1) == 1:
+            return child1
+        else:
+            return child2
+        # TODO ? Do we just select one for our new agent?
+
+        pass
+    elif chances == 0: # Uniform crossover
+        pass
+    else:
+        print("Crossover error")
+
+
+
 # Mutation function based on a given chromosome and mutation rate
 def mutate(chromosome, MUT_RATE):
 
