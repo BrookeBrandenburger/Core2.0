@@ -9,8 +9,8 @@ import shutil
 
 def crossover(chromosome1, chromosome2):
     chances = random.randint(0, 1) # Equal opprotunity for single point or uniform crossover
-    chances = 1 # TODO : DELETE
-
+    # chances = 0 #Used to manually set crossover type
+ 
     if chances == 1: # Single Point Crossover: Occurs strictly between genes
         splicePoint = random.randint(1, len(chromosome1))
         chrome1_X = chromosome1[0:splicePoint]
@@ -30,9 +30,32 @@ def crossover(chromosome1, chromosome2):
             return child2
         # TODO ? Do we just select one for our new agent?
 
-        pass
     elif chances == 0: # Uniform crossover
-        pass
+        new_chromosome = [] # Full chromosome
+        for loopIndex in range(len(chromosome1)):
+            #print("Loop Index: {}".format(loopIndex))
+            loop = [] #Loop containing 16 genes
+
+            for geneIndex in range(len(chromosome1[loopIndex])):
+                #print("Gene Index: {}".format(geneIndex))
+                gene = "" # A 9 bit representation of a jump or action gene
+                for bitIndex in range(len(chromosome1[loopIndex][geneIndex])):
+                    bit = ""
+                    if 0 == random.randint(0, 1): # Flip Bit!
+                        bit = chromosome1[loopIndex][geneIndex][bitIndex]
+                    else: 
+                        bit = chromosome2[loopIndex][geneIndex][bitIndex]
+
+                    #print("Bit: {}".format(bit))
+
+                    gene += bit
+                    #print("Gene: {}".format(gene))
+                loop.append(gene)
+            new_chromosome.append(loop)
+        
+        print("Uniform Crossover Child: {}".format(new_chromosome))
+        return new_chromosome
+
     else:
         print("Crossover error")
 
