@@ -120,7 +120,7 @@ def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and 
 def checkConditional(conditional_index, sensors):
     speed = sensors[0]
     enemy_dist = sensors[1]
-    wall_dist= sensors[2]
+    min_wall_dist = sensors[2]
     closestBulletDistance = sensors[3]
     enemy_x = sensors[4]
     enemy_y = sensors[5]
@@ -146,7 +146,7 @@ def checkConditional(conditional_index, sensors):
                         #"True",
                         "enemy_dist < 100 and enemy_dir == 3",
                         "enemy_dist < 100 and enemy_dir == 4",
-                         "wall_dist < 200", "wall_dist < 75", "wall_dist > 200" , "wall_dist < 150",
+                         "min_wall_dist < 200", "min_wall_dist < 75", "min_wall_dist > 200" , "min_wall_dist < 150",
                         "closestBulletDistance < 100", "closestBulletDistance < 200", "closestBulletDistance <50",
                         "enemy_dist == -1"
                         ]
@@ -190,7 +190,7 @@ def AI_loop():
     try:
         #speed = sensors[0]
         #enemy_dist = sensors[1]
-        #wall_dist= sensors[2] # minimum wall distance
+        #min_wall_dist= sensors[2] # minimum wall distance
         #closestBulletDistance = sensors[3]
         #enemy_x = sensors[4]
         #enemy_y = sensors[5]
@@ -229,45 +229,24 @@ def AI_loop():
             closestBulletDistance = math.inf
         
         # store in array so we can easily find the shortest feeler
-        feelers = []
-        frontWall = ai.wallFeeler(500, heading)
-        leftWall = ai.wallFeeler(500, heading + 90)
-        rightWall = ai.wallFeeler(500, heading - 90)
-        trackWall = ai.wallFeeler(500, tracking)
-        rearWall = ai.wallFeeler(500, heading - 180)
-        backLeftWall = ai.wallFeeler(500, heading + 135)
-        backRightWall = ai.wallFeeler(500, heading - 135)
-        frontLeftWall = ai.wallFeeler(500, heading + 45)
-        frontRightWall = ai.wallFeeler(500, heading - 45)
-        rightWall1 = ai.wallFeeler(500, heading - 60)
-        rightWall2 = ai.wallFeeler(500, heading - 120)
-        leftWall1 = ai.wallFeeler(500, heading + 60)
-        leftWall2 = ai.wallFeeler(500, heading + 120)
-        slightRight = ai.wallFeeler(500, heading - 85)
-        slightLeft = ai.wallFeeler(500, heading + 85)
-        feelers.append(frontWall)
-        feelers.append(leftWall)
-        feelers.append(rightWall)
-        feelers.append(trackWall)
-        feelers.append(rearWall)
-        feelers.append(backLeftWall)
-        feelers.append(backRightWall)
-        feelers.append(frontLeftWall)
-        feelers.append(frontRightWall)
-        feelers.append(rightWall1)
-        feelers.append(rightWall2)
-        feelers.append(leftWall1)
-        feelers.append(leftWall2)
-        feelers.append(slightRight)
-        feelers.append(slightLeft)
-        
-        wall_dist = min(feelers)
+        trackingFeelers = []
+        headingFeelers = []
+
+        # Tracking
+        for angle in range(0, 360, 10):
+            trackingFeelers.append(ai.wallFeeler(500, tracking + angle))
+
+        # Heading
+        for angle in range(0, 360, 10):
+            headingFeelers.append(ai.wallFeeler(500, heading + angle))
+
+        min_wall_dist = min(headingFeelers)
 
         # Disable turns by default each loop
-        ai.turnRight(0)
-        ai.turnRight(0)
+        #ai.turnRight(0)
+        #ai.turnRight(0)
 
-    
+
         global current_loop_idx
         global chrome # Decoded chromosome
         global current_loop
@@ -283,7 +262,7 @@ def AI_loop():
         print("Current Gene index: {}".format(current_gene_idx))
         print("Current Loop Index: {}".format(current_loop_idx))
         print("-"*10)
-        sensors = [speed, ENEMY_DIST, wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
+        sensors = [speed, ENEMY_DIST, min_wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
 
         # If current gene is a jump gene
         if current_loop[current_gene_idx][0] == False: # First item in gene being false indicates jump gene
