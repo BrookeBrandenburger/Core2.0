@@ -282,7 +282,7 @@ def AI_loop():
             shoot = current_loop[current_gene_idx][1] 
             thrust = 1 if current_loop[current_gene_idx][2] else 0
             
-            turnQuantity = current_loop[current_gene_idx][3]
+            turnQuantity = (current_loop[current_gene_idx][3])*2.5
             turnTarget = current_loop[current_gene_idx][4]
             
             print("Action Gene:")
@@ -300,24 +300,32 @@ def AI_loop():
             # TODO: Implement turning target and utilize turn quantity
             match turnTarget:
                 case 0:
+                #turn towards closest wall tracking
                     pass
                 case 1:
+                #turn away from closest wall tracking
                     #ai.turnLeft(1)
                     pass
                 case 2:
+                #turn towards closest wall heading
                     #ai.turnRight(1) # Place holder
                     pass
                 case 3:
+                #turn away from closest wall heading
                     pass
                 case 4:
+                #turn towards enemy ship 
                     pass
                 case 5:
+                #turn away from enemy ship
                     #ai.turnLeft(1)
                     pass
                 case 6:
+                #turn towards bullet
                     ai.turnRight(1)
                     pass
                 case 7:
+                #turn away from bullet
                     pass
             current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP) # Move to next loop in the gene (max 15)
          
