@@ -83,6 +83,7 @@ def writeChromosomeToFile(chromosome, filename):
             #for gene in loop:
         file.write(str(chromosome))
 
+# Wipes data folder for each new run of core_controller
 def createDataFolder():
 	# Data folder
     try:
