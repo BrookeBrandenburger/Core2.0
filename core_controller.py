@@ -2,7 +2,8 @@ import libpyAI as ai
 import math
 import random
 import random
-from os.path import exists
+import os 
+from os import path
 
 from chromosome import *
 
@@ -32,11 +33,19 @@ def earnedKill(ai):
     global prev_score
     global chromosome
    
-    filename = "test.txt" # TODO 
+    filename = "selChrome_0.txt"
+    filepath = "data/" + filename
+
+    while os.path.exists((filepath)):
+        index = int((filename.split("_")[1]).split(".")[0]) # Get the number at end of file name
+        index = str(index+1)
+        filename = "selChrome_{}.txt".format(index)
+        filepath = "dara/" + filename
+
     # TODO
     # Score increment indicates a kill
     if score > prev_score:
-        writeChromosomeToFile(chromosome, filename)
+        writeChromosomeToFile(chromosome, filepath)
         ai.talk('New Chrome File -' + filename)
 
 def died(ai):
@@ -44,16 +53,19 @@ def died(ai):
     global prev_score
     global chromosome
     
-    message = ai.scanMsg(0).split("-")
+    message = (ai.scanMsg(0)+ " -test.txt").split("-")
     # Score change and message with hyphen (indicating killed instead of wall collision)
-    if score != prev_score and len(message) > 1:
-        new_chromosome_file_name = message[1]
+    if score != prev_score: 
+        if len(message) > 1:
+            print("Death and death message found")
+            print(message)
+            new_chromosome_file_name = "data/" + str(message[1])
 
-        new_chromosome = None
-        with open(new_chromosome_file_name, 'r') as f:
-            new_chromosome = eval(f.read())
+            new_chromosome = None
+            with open(new_chromosome_file_name, 'r') as f:
+                new_chromosome = eval(f.read())
 
-        initializeAgent(new_chromosome)
+            initializeAgent(new_chromosome)
 
 
 def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and enemy
@@ -284,13 +296,12 @@ def AI_loop():
             current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP) # Move to next loop in the gene (max 15)
          
         print("-"*20)
-        print("Message: {}".format(ai.scanMsg(0)))
         
         # Kill/Death Tracking
         global score
         global prev_score
         earnedKill(ai) # Check for kill
-        died() # If killed, get new chromosome
+        died(ai) # If killed, get new chromosome
 
         # NOTE: Do we want to crossover with a random new chroomsome if we crash ourselves?
         prev_score = score
@@ -304,6 +315,7 @@ def AI_loop():
         ai.quitAI()
 
 def main():
+    createDataFolder()
     initializeAgent()
 
     ai.start(AI_loop, ["-name", "Core!", "-join", "localhost"])
