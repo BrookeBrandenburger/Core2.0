@@ -5,6 +5,7 @@ import random
 import os 
 from os import path
 import sys
+import traceback
 
 from chromosome import *
 
@@ -64,14 +65,14 @@ def died(ai):
     # Start frame counter after a negative score change
     if score < prev_score:
         framesPostDeath = 1
-        print("Score: {}".format(score))
-        print("Previous Score: {}".format(prev_score))
+        #print("Score: {}".format(score))
+        #print("Previous Score: {}".format(prev_score))
 
     if framesPostDeath >= 1 and framesPostDeath < 100:
         framesPostDeath += 1
     else:
         framesPostDeath = 0
-    print("Frames post Death: {}".format(framesPostDeath))
+    #print("Frames post Death: {}".format(framesPostDeath))
 
     # Score change and message with hyphen (indicating killed instead of wall collision)
     if (framesPostDeath != 0): 
@@ -105,10 +106,36 @@ def died(ai):
 
                 initializeAgent(mutated_child) # Set new chromosome in place of old
 
+# Relative to us
+def findMinWallAngle(wallFeelers):
+    min_wall = min(wallFeelers)
+    min_index = wallFeelers.index(min_wall)
 
+    angle = int(10*min_index)
 
-def findAngle(X, Y, ENEMY_X, ENEMY_Y, heading):  # Taking the X coordinates of agent and enemy
+    #angleToEnemy = heading - enemy_angle
 
+    if angle < 180: # wall to the right
+        return angle
+    else:
+        return angle - 360
+
+# Relative to us
+def findMaxWallAngle(wallFeelers):
+    max_wall = max(wallFeelers)
+    max_index = wallFeelers.index(max_wall)
+
+    angle = int(10*max_index)
+
+    #angleToEnemy = heading - enemy_angle
+
+    if angle < 180: # wall to the right
+        return angle
+    else:
+        return angle - 360
+
+# Relative to world internally, returns relative to us
+def findAngle(X, Y, ENEMY_X, ENEMY_Y, heading):
     new_enemy_x = ENEMY_X - X
     new_enemy_y = ENEMY_Y - Y
 
@@ -119,8 +146,8 @@ def findAngle(X, Y, ENEMY_X, ENEMY_Y, heading):  # Taking the X coordinates of a
     except:
         enemy_angle = 0 # in the case of division by 0
 
-    angleToEnemy = heading - enemy_angle
-    
+    angleToEnemy = int(heading - enemy_angle)
+
     if angleToEnemy < 360 - angleToEnemy: # enemy to the right
         return angleToEnemy
     else:
@@ -144,6 +171,7 @@ def checkConditional(conditional_index, sensors):
     enemy_y = sensors[5]
     x = sensors[6]
     y = sensors[7]
+    heading = sensors[8]
     
     
     if enemy_dist == None:
@@ -275,12 +303,12 @@ def AI_loop():
     
         #print("Chrome: {}".format(chrome))
         #print("Raw chrome values: {}".format(raw_chrome_values))
-        print("Current gene: {}".format(current_loop))
-        print("Current loop: {}".format(current_loop[current_gene_idx]))
-        print("Current Gene index: {}".format(current_gene_idx))
-        print("Current Loop Index: {}".format(current_loop_idx))
-        print("-"*10)
-        sensors = [speed, ENEMY_DIST, min_wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y]
+        #print("Current gene: {}".format(current_loop))
+        #print("Current loop: {}".format(current_loop[current_gene_idx]))
+        #print("Current Gene index: {}".format(current_gene_idx))
+        #print("Current Loop Index: {}".format(current_loop_idx))
+        #print("-"*10)
+        sensors = [speed, ENEMY_DIST, min_wall_dist, closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y, heading]
 
         # If current gene is a jump gene
         if current_loop[current_gene_idx][0] == False: # First item in gene being false indicates jump gene
@@ -292,7 +320,7 @@ def AI_loop():
                 current_loop = chrome[current_loop_idx] # Set new current gene based on the index
                 current_gene_idx = 0 # Reset loop index to 0 for the new gene
 
-                print("Jumping to: {}".format(current_loop_idx))
+                #print("Jumping to: {}".format(current_loop_idx))
             else:
                 current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP) # Move to next loop in the gene (max 15)
         else: 
@@ -300,40 +328,56 @@ def AI_loop():
             shoot = current_loop[current_gene_idx][1] 
             thrust = 1 if current_loop[current_gene_idx][2] else 0
             
-            turnQuantity = (current_loop[current_gene_idx][3]) * 2.5 # Scale up
+            turnQuantity = int((current_loop[current_gene_idx][3]) * 2) # Scale up
             turnTarget = current_loop[current_gene_idx][4]
             
-            print("Action Gene:")
-            print("Shoot: {}".format(shoot))
-            print("Thrust: {}".format(thrust))
-            print("Turn Quantity: {}".format(turnQuantity))
-            print("Turn Target Num: {}".format(turnTarget))
-            print("-"*40)
+            #print("Action Gene:")
+            #print("Shoot: {}".format(shoot))
+            #print("Thrust: {}".format(thrust))
+            #print("Turn Quantity: {}".format(turnQuantity))
+            #print("Turn Target Num: {}".format(turnTarget))
+            #print("-"*40)
 
             ai.thrust(thrust)
             ai.fireShot() if shoot else None #ai.fireShot(shoot) # Shoot if shoot is true
           
             # Pick turn target based on numerical identifier from loop.
-            #Examples from paper: nearestShip, oppsoiteClosestWall, most dangerous bullet etc
-            # TODO: Implement turning target and utilize turn quantity
-
+            #Examples from paper: nearestShip, oppsoiteClosestWall, most dangerous bullet etc    
             match turnTarget:
                 case 0:
-                #turn towards closest wall tracking
-                    pass
+                    #turn towards closest wall heading
+                    angle = findMinWallAngle(headingFeelers)
+
+                    if angle < 0:
+                        ai.turn(-1*turnQuantity)
+                    elif angle > 0:
+                        ai.turn(turnQuantity)
                 case 1:
-                #turn away from closest wall tracking
-                    #ai.turnLeft(1)
-                    pass
+                    #turn away from closest wall heading
+                    angle = findMinWallAngle(headingFeelers)
+
+                    if angle > 0:
+                        ai.turn(-1*turnQuantity)
+                    elif angle < 0:
+                        ai.turn(turnQuantity)
                 case 2:
-                #turn towards closest wall heading
-                    #ai.turnRight(1) # Place holder
-                    pass
+                    #turn towards furthest wall heading
+                    angle = findMaxWallAngle(headingFeelers)
+
+                    if angle < 0:
+                        ai.turn(-1*turnQuantity)
+                    elif angle > 0:
+                        ai.turn(turnQuantity)
                 case 3:
-                #turn away from closest wall heading
-                    pass
+                    #turn away from furthest wall heading
+                    angle = findMaxWallAngle(headingFeelers)
+
+                    if angle > 0:
+                        ai.turn(-1*turnQuantity)
+                    elif angle < 0:
+                        ai.turn(turnQuantity)
                 case 4:
-                #turn towards enemy ship
+                    #turn towards enemy ship
                     if ENEMY_DIST != None:
                         angleToEnemy = findAngle(X, Y, ENEMY_X, ENEMY_Y, heading)
 
@@ -343,7 +387,7 @@ def AI_loop():
                             ai.turn(turnQuantity)
                     
                 case 5:
-                #turn away from enemy ship
+                    #turn away from enemy ship
                     if ENEMY_DIST != None:
                         angleToEnemy = findAngle(X, Y, ENEMY_X, ENEMY_Y, heading)
 
@@ -353,15 +397,32 @@ def AI_loop():
                             ai.turn(turnQuantity)
 
                 case 6:
-                #turn towards bullet
-                    ai.turnRight(1)
-                    pass
+                    #turn towards bullet
+                    if ai.shotDist(0) != -1:
+                        SHOT_X = ai.shotX(0)
+                        SHOT_Y = ai.shotY(0)
+                        angleToShot = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
+
+                        if angleToShot < 0:
+                            ai.turn(-1*turnQuantity)
+                        elif angleToShot > 0:
+                            ai.turn(turnQuantity)
+
                 case 7:
-                #turn away from bullet
-                    pass
+                    #turn away from bullet
+                    if ai.shotDist(0) != -1:
+                        SHOT_X = ai.shotX(0)
+                        SHOT_Y = ai.shotY(0)
+                        angleToShot = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
+
+                        if angleToShot > 0:
+                            ai.turn(-1*turnQuantity)
+                        elif angleToShot < 0:
+                            ai.turn(turnQuantity)
+
             current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP) # Move to next loop in the gene (max 15)
          
-        print("-"*20)
+        #print("-"*20)
         
         # Kill/Death Tracking
         global score
@@ -382,6 +443,7 @@ def AI_loop():
     except Exception as e:
         print("Exception")
         print(str(e))
+        traceback.print_exc()
         ai.quitAI()
 
 def main():

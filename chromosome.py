@@ -151,8 +151,8 @@ def generateChromosome():
 
 def writeChromosomeToFile(chromosome, filename):
     dataPath = "data/" + filename
-    print(dataPath)
-    print(os.path.exists(dataPath))
+    #print(dataPath)
+    #print(os.path.exists(dataPath))
     with open(dataPath, "w") as file:
          #for loop in chromosome:
             #for gene in loop:
