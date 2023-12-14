@@ -107,16 +107,34 @@ def died(ai):
 
 
 
-def findAngle(X, ENEMY_X, ENEMY_DIST):  # Taking the X coordinates of agent and enemy
-    hyp = ENEMY_DIST
-    if ENEMY_X - X > 0:
-        x_dist = ENEMY_X - X
-    else:
-        x_dist = X - ENEMY_X
-    theta = int(math.degrees(math.acos(x_dist / hyp))) - 90
+def findAngle(X, Y, ENEMY_X, ENEMY_Y, heading):  # Taking the X coordinates of agent and enemy
 
-    return theta
+    new_enemy_x = ENEMY_X - X
+    new_enemy_y = ENEMY_Y - Y
+
+    # If positive, enemy to right
+    # If negative, enemy to left
+    try:
+        enemy_angle = math.degrees(math.atan(new_enemy_y/new_enemy_x))
+    except:
+        enemy_angle = 0 # in the case of division by 0
+
+    angleToEnemy = heading - enemy_angle
     
+    if angleToEnemy < 360 - angleToEnemy: # enemy to the right
+        return angleToEnemy
+    else:
+        return angleToEnemy - 360
+
+    #hyp = ENEMY_DIST
+    #if ENEMY_X - X > 0:
+    #    x_dist = ENEMY_X - X
+    #else:
+    #    x_dist = X - ENEMY_X
+
+
+    #theta = int(math.degrees(math.acos(x_dist / hyp))) - 90
+
 def checkConditional(conditional_index, sensors):
     speed = sensors[0]
     enemy_dist = sensors[1]
@@ -134,7 +152,7 @@ def checkConditional(conditional_index, sensors):
         enemy_x = -1
         enemy_y = -1
         
-    enemy_dir = getEnemyDirection(enemy_dist, enemy_x, enemy_y, x, y)
+    enemy_dir = getEnemyDirection(enemy_dist, enemy_x, enemy_y, x, y, heading)
     
             
 
@@ -158,7 +176,7 @@ def checkConditional(conditional_index, sensors):
 def wallBetweenTarget(X, Y, ENEMY_X, ENEMY_Y):
     return ai.wallBetween(int(X), int(Y), int(ENEMY_X), int(ENEMY_Y)) != -1
     
-def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y):
+def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y, heading):
     direction = -1
     
     theta = None
@@ -168,7 +186,7 @@ def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y):
     if Enemy_Dist != -1: 
         xDistToEnemy = Enemy_X - X
         yDistToEnemy = Enemy_Y - Y
-        theta = findAngle(X, Enemy_X, Enemy_Dist)
+        theta = findAngle(X, Y, Enemy_X, Enemy_Y, heading)
         wallPreEnemy = wallBetweenTarget(X,Y, Enemy_X, Enemy_Y)
         
     else:
@@ -282,7 +300,7 @@ def AI_loop():
             shoot = current_loop[current_gene_idx][1] 
             thrust = 1 if current_loop[current_gene_idx][2] else 0
             
-            turnQuantity = (current_loop[current_gene_idx][3])*2.5
+            turnQuantity = (current_loop[current_gene_idx][3]) * 2.5 # Scale up
             turnTarget = current_loop[current_gene_idx][4]
             
             print("Action Gene:")
@@ -298,6 +316,7 @@ def AI_loop():
             # Pick turn target based on numerical identifier from loop.
             #Examples from paper: nearestShip, oppsoiteClosestWall, most dangerous bullet etc
             # TODO: Implement turning target and utilize turn quantity
+
             match turnTarget:
                 case 0:
                 #turn towards closest wall tracking
@@ -316,17 +335,23 @@ def AI_loop():
                 case 4:
                 #turn towards enemy ship
                     if ENEMY_DIST != None:
-                        angle = findAngle(X, ENEMY_X, EMENY_DIST)
-                        
-                        
-                        ahi.turn(turnQuantity)
-                    
-                        
+                        angleToEnemy = findAngle(X, Y, ENEMY_X, ENEMY_Y, heading)
+
+                        if angleToEnemy < 0:
+                            ai.turn(-1*turnQuantity)
+                        elif angleToEnemy > 0:
+                            ai.turn(turnQuantity)
                     
                 case 5:
                 #turn away from enemy ship
-                    #ai.turnLeft(1)
-                    pass
+                    if ENEMY_DIST != None:
+                        angleToEnemy = findAngle(X, Y, ENEMY_X, ENEMY_Y, heading)
+
+                        if angleToEnemy > 0:
+                            ai.turn(-1*turnQuantity)
+                        else:
+                            ai.turn(turnQuantity)
+
                 case 6:
                 #turn towards bullet
                     ai.turnRight(1)
