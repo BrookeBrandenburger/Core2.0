@@ -116,6 +116,10 @@ class CoreAgent():
             # Write the traceback to file
             with open("tracebacks/traceback_{}.txt".format(bot_num), "w") as file:
                 file.write(traceback_str)
+                file.write(str(self.bin_chromosome))
+                file.write(str(self.dec_chromosome))
+                file.write(str(self.current_loop))
+
             ai.quitAI()
 
         #print(self.score)
@@ -258,8 +262,9 @@ class CoreAgent():
 
                     # Evolution
                     cross_over_child = Evolver.crossover(self.bin_chromosome, new_chromosome)
+                    print("Crossover_child: {}".format(cross_over_child))
                     mutated_child: List[List] = Evolver.mutate(cross_over_child, self.MUT_RATE)
-                    print(mutated_child)
+                    print("Mutated_child: {}".format(mutated_child))
                     # Set new chromosome in place of old
                     self.initializeCGA(mutated_child)
 

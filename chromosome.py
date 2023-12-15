@@ -14,24 +14,28 @@ class Evolver():
         # Equal opprotunity for single point or uniform crossover
         chances = random.randint(0, 1)
         # chances = 0 #Used to manually set crossover type
+        child = None
+
+        #
+        # Do full crossover then overlay the original jump/conditional values
+        #
 
         if chances == 1:  # Single Point Crossover: Occurs strictly between genes
+            # Split between jump gene and following action genes
             splicePoint = random.randint(1, len(chromosome1))
             chrome1_X = chromosome1[0:splicePoint]
             chrome1_Y = chromosome1[splicePoint:]
-            # print(chrome1_X)
             chrome2_X = chromosome2[0:splicePoint]
             chrome2_Y = chromosome2[splicePoint:]
 
             child1 = chrome1_X + chrome2_Y
             child2 = chrome2_X + chrome1_Y
-            #print("Child 1: {}".format(child1))
-            #print("Child 2: {}".format(child2))
 
             if random.randint(0, 1) == 1:  # Randomly select a child to return
-                return child1
+                child = child1
             else:
-                return child2
+                child = child2
+
             # TODO ? Do we just select one for our new agent?
 
         elif chances == 0:  # Uniform crossover
@@ -41,22 +45,32 @@ class Evolver():
 
                 for geneIndex in range(len(chromosome1[loopIndex])):
                     gene = ""  # A 9 bit representation of a jump or action gene
-                    for bitIndex in range(1, len(chromosome1[loopIndex][geneIndex])): # Start at one to not flip jump and actions
+                    for bitIndex in range(0, len(chromosome1[loopIndex][geneIndex])):  # Start at one to not flip jump and actions  # noqa: E501
                         bit = ""
                         if 0 == random.randint(0, 1):  # Flip Bit!
                             bit = chromosome1[loopIndex][geneIndex][bitIndex]
                         else:
                             bit = chromosome2[loopIndex][geneIndex][bitIndex]
 
+                        if bitIndex == 0:
+                            bit = chromosome1[loopIndex][geneIndex][bitIndex]
+
                         gene += bit
                     loop.append(gene)
                 new_chromosome.append(loop)
 
             #print("Uniform Crossover Child: {}".format(new_chromosome))
-            return new_chromosome
+            child = new_chromosome
 
         else:
             print("Crossover error")
+
+        for geneIndex in range(len(child)):
+            if cls.isJumpGene(child[geneIndex]):
+                newJumpGene = chromosome1[0:5] + child[geneIndex][5:]
+                child[geneIndex] = newJumpGene
+        print("Chiild: {}".format(child))
+        return child
 
     # Mutation function based on a given chromosome and mutation rate
     @classmethod
