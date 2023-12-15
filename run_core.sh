@@ -6,7 +6,7 @@ echo "Starting Xpilots Server"
 gnome-terminal -- ./xpilots -map simple.xp -noquit -switchBase 1.0 +teams -maxRoundTime 20 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 10    
 sleep 3
 # Set the number of instances you want to run
-num_instances=3
+num_instances=5
 
 # Loop to run multiple instances
 for ((i=1; i<=$num_instances; i++)); do

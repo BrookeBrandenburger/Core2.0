@@ -5,7 +5,7 @@ import os
 import sys
 import traceback
 from typing import Union, List, Any, Optional
-
+import shutil
 from chromosome import Evolver
 
 
@@ -15,6 +15,7 @@ class CoreAgent():
         # Properties
         self.MUT_RATE: int = 300
         self.GENES_PER_LOOP: int = 8
+        self.agent_id = "-1"
 
         # Positionals
         self.heading: float = float(ai.selfHeadingDeg())
@@ -60,36 +61,47 @@ class CoreAgent():
         self.shot_y: int = -1
         self.angle_to_shot: int = -1
 
+        self.createTracebackFolder()
         self.initializeCGA()
         self.generateFeelers(10)
         print("Alive!")
 
+    @classmethod
+    def createTracebackFolder(cls):
+        # Data folder
+        try:
+            shutil.rmtree("tracebacks/")
+        except:
+            pass
+
+        os.mkdir("tracebacks/")
     # AI LOOP
     def AI_Loop(self) -> None:
         try:
-            self.updateAgentData()
-            self.updateEnemyData()
-            self.updateBulletData()
-            self.updateScore()
+            if ai.selfAlive() == 1:  # Alive
+                self.updateAgentData()
+                self.updateEnemyData()
+                self.updateBulletData()
+                self.updateScore()
 
-            gene: List[Any] = self.current_loop[self.current_gene_idx]
-            print("Gene: {}".format(gene))
-            if self.isJumpGene(gene):   # If gene is a jump gene
-                if self.checkConditional(gene[1]):  # If the conditional is true
-                    # Jump
-                    self.current_loop_idx = gene[2]
-                    self.current_loop = self.dec_chromosome[self.current_loop_idx]
-                    self.current_gene_idx = 0
-    
-                    # TODO : Make this check repeat so we always execute an action in any given frame
-                    return  # End current iteration to start at new cycle
-                else: # The conditional is not true
-                    self.incrementGeneIndex()
-            gene = self.current_loop[self.current_gene_idx]
+                gene: List[Any] = self.current_loop[self.current_gene_idx]
+                print("Gene: {}".format(gene))
+                if Evolver.isJumpGene(gene):   # If gene is a jump gene
+                    if self.checkConditional(gene[1]):  # If the conditional is true
+                        # Jump
+                        self.current_loop_idx = gene[2]
+                        self.current_loop = self.dec_chromosome[self.current_loop_idx]
+                        self.current_gene_idx = 0
+        
+                        # TODO : Make this check repeat so we always execute an action in any given frame
+                        return  # End current iteration to start at new cycle
+                    else: # The conditional is not true
+                        self.incrementGeneIndex()
+                gene = self.current_loop[self.current_gene_idx]
 
-            # Action gene
-            ActionGene(gene, self)
-            self.incrementGeneIndex()
+                # Action gene
+                ActionGene(gene, self)
+                self.incrementGeneIndex()
 
             self.earnedKill()
             self.died()
@@ -98,6 +110,12 @@ class CoreAgent():
             print("Exception")
             print(str(e))
             traceback.print_exc()
+
+            traceback_str = traceback.format_exc()
+
+            # Write the traceback to file
+            with open("tracebacks/traceback_{}.txt".format(bot_num), "w") as file:
+                file.write(traceback_str)
             ai.quitAI()
 
         #print(self.score)
@@ -109,10 +127,6 @@ class CoreAgent():
         self.current_gene_idx = ((self.current_gene_idx + 1) % self.GENES_PER_LOOP)
         return self.current_gene_idx
 
-    # Returns true if a gene is jump gene
-    def isJumpGene(self, gene: List[Any]) -> bool:
-        #print(gene)
-        return gene[0] == False
 
     def updateScore(self) -> None:
         self.prev_score = self.score
@@ -243,8 +257,8 @@ class CoreAgent():
                         new_chromosome = eval(f.read()) # TODO remove eval
 
                     # Evolution
-                    cross_over_child = crossover(self.bin_chromosome, new_chromosome)
-                    mutated_child: List[List] = mutate(cross_over_child, self.MUT_RATE)
+                    cross_over_child = Evolver.crossover(self.bin_chromosome, new_chromosome)
+                    mutated_child: List[List] = Evolver.mutate(cross_over_child, self.MUT_RATE)
                     print(mutated_child)
                     # Set new chromosome in place of old
                     self.initializeCGA(mutated_child)
@@ -443,14 +457,17 @@ class ActionGene():
 
 def loop():
     global agent
+    global bot_num
     if agent is None:
         agent = CoreAgent()
+        agent.agent_id = bot_num
 
     agent.AI_Loop()
 
 
 def main():
-    bot_num: str = sys.argv[1]
+    global bot_num
+    bot_num = sys.argv[1]
 
     Evolver.createDataFolder()
     global agent

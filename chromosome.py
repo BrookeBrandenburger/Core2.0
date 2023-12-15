@@ -58,27 +58,52 @@ class Evolver():
         else:
             print("Crossover error")
 
-
     # Mutation function based on a given chromosome and mutation rate
     @classmethod
     def mutate(cls, chromosome, MUT_RATE):
-
         new_chromosome: List[List[Any]] = []  # Full chromosome
         for loopIndex in range(len(chromosome)):
             loop = []  # Loop containing 16 genes
 
             for geneIndex in range(len(chromosome[loopIndex])):
+                gene = chromosome[loopIndex][geneIndex]
+                new_gene = ""  # A 9 bit representation of a jump or action gene
+                #
+                #print(gene)
+                #print("IsJumpGene: {}".format(cls.isJumpGene(gene)))
+                if cls.isJumpGene(gene):  # If the gene is a jump gene
+                    new_gene += gene[0:5]
+                    #print(new_gene)
 
-                gene = ""  # A 9 bit representation of a jump or action gene
-                for bit in chromosome[loopIndex][geneIndex][1:]:  # Start at one to keep action genes and jump genes defined
-                    if 0 == random.randint(0, MUT_RATE):  # Mutate Time!
-                        # Replaces 1 with 0 or 0 with 1
-                        bit = '1' if bit == '0' else '0'
-                    gene += bit
-                loop.append(gene)
+                    for bit in gene[5:]:  # In a jump gene, the only dynamic bits are the loop number 
+                        if 0 == random.randint(0, MUT_RATE):  # Mutate Time!
+                            # Replaces 1 with 0 or 0 with 1
+                            bit = '1' if bit == '0' else '0'
+                        new_gene += bit
+
+                else:  # Action Gene
+                    new_gene += gene[0]          
+                    for bit in gene[1:]: # Action gene has dynamic bits after bit 0.
+                        if 0 == random.randint(0, MUT_RATE):  # Mutate Time!
+                            # Replaces 1 with 0 or 0 with 1
+                            bit = '1' if bit == '0' else '0'
+                        new_gene += bit
+
+                loop.append(new_gene)
             new_chromosome.append(loop)
 
         return new_chromosome
+
+    @classmethod
+    # Returns true if a gene is jump gene
+    def isJumpGene(cls, gene: List[Any]) -> bool:
+        #print(gene)
+
+        # Cases to accept both decoded and raw chromosomes
+        if type(gene[0]) == bool:
+            return gene[0] is False
+        elif type(gene[0]) == str:
+            return gene[0] == "1"
 
     @classmethod
     def readChrome(cls, chrome):
@@ -118,7 +143,6 @@ class Evolver():
 
         return loops
 
-    # TODO : Add set conditional numbers
     @classmethod
     def generateChromosome(cls):
         # Gene Size 9 bits
@@ -130,15 +154,15 @@ class Evolver():
                 gene = ""
                 for j in range(9):  # gene size
                     # Jump gene construction
-                    if i == 0 and j==0: # i== 0 is first gene, j ==0 is first bit
+                    if i == 0 and j == 0:  # Predef jump bit
                         gene += "1"
-                    elif j == 0 :
+                    elif j == 0:  # Predef action bit
                         gene += "0"
-                    elif i == 0 and j == 1:
+                    elif i == 0 and j == 1:  # Predefined conditional numbers
                         gene += format(loopIndex, '04b') # 4 bit 0 padding
                     elif i == 0 and j > 4:
                         gene += str(random.randint(0, 1))
-                    elif i > 0: # Target number for jump gene
+                    elif i > 0:  # Regular action gene pure random 
                         gene += str(random.randint(0, 1))
                 #print(gene)
                 loop.append(gene)
@@ -169,3 +193,4 @@ class Evolver():
             pass
 
         os.mkdir("data/")
+
