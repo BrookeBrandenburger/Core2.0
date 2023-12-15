@@ -6,7 +6,7 @@ import sys
 import traceback
 from typing import Union, List, Any, Optional
 
-from chromosome import readChrome, createDataFolder, crossover, mutate, generateChromosome, writeChromosomeToFile
+from chromosome import Evolver
 
 
 class CoreAgent():
@@ -33,9 +33,9 @@ class CoreAgent():
         ai.setPower(8)
 
         # Genetic Data
-        self.bin_chromosome: Optional[List[List[str]]] = None # Binary chromosome, originally called chromosome or raw_chrome_values
-        self.dec_chromosome: Optional[List[List[Any]]] = None #Decoded chromosome 
-        self.current_loop: Optional[List[List]] = None # Current loop in the chromosome 
+        self.bin_chromosome: Optional[List[List[str]]] = None  # Binary chromosome, originally called chromosome or raw_chrome_values
+        self.dec_chromosome: Optional[List[List[Any]]] = None  #Decoded chromosome 
+        self.current_loop: Optional[List[List]] = None  # Current loop in the chromosome 
 
         # Genetic Indices
         self.current_loop_idx: int = 0
@@ -179,9 +179,9 @@ class CoreAgent():
 
     # Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
 
-    def initializeCGA(self, input_chrome: List[List[str]] = generateChromosome()) -> None:
+    def initializeCGA(self, input_chrome: List[List[str]] = Evolver.generateChromosome()) -> None:
         self.bin_chromosome = input_chrome
-        self.dec_chromosome = readChrome(self.bin_chromosome)
+        self.dec_chromosome = Evolver.readChrome(self.bin_chromosome)
 
         print("Chromosome: {}".format(self.bin_chromosome))
 
@@ -204,7 +204,7 @@ class CoreAgent():
 
         # Score increment indicates a kill
         if self.score > self.prev_score:
-            writeChromosomeToFile(self.bin_chromosome, filename)
+            Evolver.writeChromosomeToFile(self.bin_chromosome, filename)
             ai.talk('New Chrome File -' + filename)  # Chat the file name
 
     # Checks if the agent has died, if yes and it was killed by another agent
@@ -243,17 +243,9 @@ class CoreAgent():
                         new_chromosome = eval(f.read()) # TODO remove eval
 
                     # Evolution
-                    #print("Transferred Chrome: {}".format(new_chromosome))
                     cross_over_child = crossover(self.bin_chromosome, new_chromosome)
-                    #print("Crossover child: {}".format(cross_over_child))
                     mutated_child: List[List] = mutate(cross_over_child, self.MUT_RATE)
-                    #print("Mutated child: {}".format(mutated_child))
-
-                    # Check that the new chromosome is different than old, insanely low odds for it to be the same
-                    # print("*"*50)
-                    #print(mutated_child == chromosome)
-                    # print("*"*50)
-
+                    print(mutated_child)
                     # Set new chromosome in place of old
                     self.initializeCGA(mutated_child)
 
@@ -460,7 +452,7 @@ def loop():
 def main():
     bot_num: str = sys.argv[1]
 
-    createDataFolder()
+    Evolver.createDataFolder()
     global agent
 
     agent = None
