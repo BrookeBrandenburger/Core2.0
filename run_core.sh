@@ -3,7 +3,7 @@
 # Start Server
 echo "Starting Xpilots Server"
 # switchBase 1 = 100% probability to swap bases on death, + teams disables teams
-gnome-terminal -- ./xpilots -map core.xp -noquit -switchBase 1.0 +teams -maxRoundTime 20 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 10    
+gnome-terminal -- ./xpilots -map simple.xp -noquit -switchBase 1.0 +teams -maxRoundTime 20 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 10    
 sleep 3
 # Set the number of instances you want to run
 num_instances=2

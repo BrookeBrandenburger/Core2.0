@@ -8,8 +8,30 @@ from typing import Union, List, Any
 
 from chromosome import *
 
-# Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
+# All run-once instructions
+def setup(ai, heading, tracking) -> None:
+    initializeAgent()
+    generateFeelers(ai, heading, tracking)
 
+# Create all needed wall feelers for the AI
+def generateFeelers(ai, heading: float, tracking: float) -> None: 
+    global headingFeelers
+    global trackingFeelers
+
+    # store in array so we can easily find the shortest feeler
+    #trackingFeelers = []
+    headingFeelers = []
+    trackingFeelers = []
+
+    # Tracking
+    for angle in range(0, 360, 10):
+        trackingFeelers.append(ai.wallFeeler(500, int(tracking + angle)))
+
+    # Heading
+    for angle in range(0, 360, 10):
+        headingFeelers.append(ai.wallFeeler(500, int(heading + angle)))
+
+# Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
 
 def initializeAgent(input_chrome: List[List] = generateChromosome()) -> None:
     # Chomosome Controllers! #[[loop1], [loop2]]
@@ -235,6 +257,16 @@ def getEnemyDirection(Enemy_Dist: float, Enemy_X: int, Enemy_Y: int, X: int, Y: 
 
 def AI_loop():
     try:
+        global headingFeelers
+        global trackingFeelers
+        global started
+
+        # get information
+        heading: float = float(ai.selfHeadingDeg())
+        tracking: float = float(ai.selfTrackingDeg())
+        if not started:
+            setup(ai, heading, tracking)
+
         ai.setPower(8)
         ai.setTurnSpeed(20.0)
 
@@ -244,9 +276,7 @@ def AI_loop():
         X: int = int(ai.selfX())
         Y: int = int(ai.selfY())
 
-        # get information
-        heading: int = int(ai.selfHeadingDeg())
-        tracking: int = int(ai.selfTrackingDeg())
+
 
         # Enemy Details
         closestShipId: int = int(ai.closestShipId())
@@ -269,18 +299,6 @@ def AI_loop():
         else:
             closestBulletDistance = math.inf
 
-        # store in array so we can easily find the shortest feeler
-        #trackingFeelers = []
-        headingFeelers: list[int] = []
-
-        # Tracking
-        # for angle in range(0, 360, 10):
-        #    trackingFeelers.append(ai.wallFeeler(500, tracking + angle))
-
-        # Heading
-        for angle in range(0, 360, 10):
-            headingFeelers.append(ai.wallFeeler(500, heading + angle))
-
         min_wall_dist: int = min(headingFeelers)
 
         # Disable turns by default each loop
@@ -294,7 +312,7 @@ def AI_loop():
         global chromosome
 
         GENES_PER_LOOP: int = 8
-
+        
         #print("Chrome: {}".format(chrome))
         #print("Raw chrome values: {}".format(raw_chrome_values))
         #print("Current gene: {}".format(current_loop))
@@ -453,11 +471,11 @@ def main():
     bot_num: str = sys.argv[1]
 
     createDataFolder()
-
-    initializeAgent()
     global prev_score
     global score
+    global started
 
+    started = False
     score = 0
     prev_score = 0
 
