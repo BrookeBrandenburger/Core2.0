@@ -5,8 +5,8 @@ import os
 import sys
 import traceback
 from typing import Union, List, Any, Optional
-
-from chromosome import readChrome, createDataFolder, crossover, mutate, generateChromosome, writeChromosomeToFile
+import shutil
+from chromosome import Evolver
 
 
 class CoreAgent():
@@ -15,6 +15,7 @@ class CoreAgent():
         # Properties
         self.MUT_RATE: int = 300
         self.GENES_PER_LOOP: int = 8
+        self.agent_id = "-1"
 
         # Positionals
         self.heading: float = float(ai.selfHeadingDeg())
@@ -33,9 +34,9 @@ class CoreAgent():
         ai.setPower(8)
 
         # Genetic Data
-        self.bin_chromosome: Optional[List[List[str]]] = None # Binary chromosome, originally called chromosome or raw_chrome_values
-        self.dec_chromosome: Optional[List[List[Any]]] = None #Decoded chromosome 
-        self.current_loop: Optional[List[List]] = None # Current loop in the chromosome 
+        self.bin_chromosome: Optional[List[List[str]]] = None  # Binary chromosome, originally called chromosome or raw_chrome_values
+        self.dec_chromosome: Optional[List[List[Any]]] = None  #Decoded chromosome 
+        self.current_loop: Optional[List[List]] = None  # Current loop in the chromosome 
 
         # Genetic Indices
         self.current_loop_idx: int = 0
@@ -60,36 +61,47 @@ class CoreAgent():
         self.shot_y: int = -1
         self.angle_to_shot: int = -1
 
+        self.createTracebackFolder()
         self.initializeCGA()
         self.generateFeelers(10)
         print("Alive!")
 
+    @classmethod
+    def createTracebackFolder(cls):
+        # Data folder
+        try:
+            shutil.rmtree("tracebacks/")
+        except:
+            pass
+
+        os.mkdir("tracebacks/")
     # AI LOOP
     def AI_Loop(self) -> None:
         try:
-            self.updateAgentData()
-            self.updateEnemyData()
-            self.updateBulletData()
-            self.updateScore()
+            if ai.selfAlive() == 1:  # Alive
+                self.updateAgentData()
+                self.updateEnemyData()
+                self.updateBulletData()
+                self.updateScore()
 
-            # gene: List[Any] = self.current_loop[self.current_gene_idx]
-            # print("Gene: {}".format(gene))
-            # if self.isJumpGene(gene):   # If gene is a jump gene
-            #     if self.checkConditional(gene[1]):  # If the conditional is true
-            #         # Jump
-            #         self.current_loop_idx = gene[2]
-            #         self.current_loop = self.dec_chromosome[self.current_loop_idx]
-            #         self.current_gene_idx = 0
-    
-            #         # TODO : Make this check repeat so we always execute an action in any given frame
-            #         return  # End current iteration to start at new cycle
-            #     else: # The conditional is not true
-            #         self.incrementGeneIndex()
-            # gene = self.current_loop[self.current_gene_idx]
+                gene: List[Any] = self.current_loop[self.current_gene_idx]
+                print("Gene: {}".format(gene))
+                if Evolver.isJumpGene(gene):   # If gene is a jump gene
+                    if self.checkConditional(gene[1]):  # If the conditional is true
+                        # Jump
+                        self.current_loop_idx = gene[2]
+                        self.current_loop = self.dec_chromosome[self.current_loop_idx]
+                        self.current_gene_idx = 0
+        
+                        # TODO : Make this check repeat so we always execute an action in any given frame
+                        return  # End current iteration to start at new cycle
+                    else: # The conditional is not true
+                        self.incrementGeneIndex()
+                gene = self.current_loop[self.current_gene_idx]
 
-            # # Action gene
-            # ActionGene(gene, self)
-            # self.incrementGeneIndex()
+                # Action gene
+                ActionGene(gene, self)
+                self.incrementGeneIndex()
 
             self.earnedKill()
             self.died()
@@ -98,6 +110,16 @@ class CoreAgent():
             print("Exception")
             print(str(e))
             traceback.print_exc()
+
+            traceback_str = traceback.format_exc()
+
+            # Write the traceback to file
+            with open("tracebacks/traceback_{}.txt".format(bot_num), "w") as file:
+                file.write(traceback_str)
+                file.write(str(self.bin_chromosome))
+                file.write(str(self.dec_chromosome))
+                file.write(str(self.current_loop))
+
             ai.quitAI()
 
         #print(self.score)
@@ -109,10 +131,6 @@ class CoreAgent():
         self.current_gene_idx = ((self.current_gene_idx + 1) % self.GENES_PER_LOOP)
         return self.current_gene_idx
 
-    # Returns true if a gene is jump gene
-    def isJumpGene(self, gene: List[Any]) -> bool:
-        #print(gene)
-        return gene[0] == False
 
     def updateScore(self) -> None:
         self.prev_score = self.score
@@ -179,9 +197,9 @@ class CoreAgent():
 
     # Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
 
-    def initializeCGA(self, input_chrome: List[List[str]] = generateChromosome()) -> None:
+    def initializeCGA(self, input_chrome: List[List[str]] = Evolver.generateChromosome()) -> None:
         self.bin_chromosome = input_chrome
-        self.dec_chromosome = readChrome(self.bin_chromosome)
+        self.dec_chromosome = Evolver.readChrome(self.bin_chromosome)
 
         print("Chromosome: {}".format(self.bin_chromosome))
 
@@ -204,7 +222,7 @@ class CoreAgent():
 
         # Score increment indicates a kill
         if self.score > self.prev_score:
-            writeChromosomeToFile(self.bin_chromosome, filename)
+            Evolver.writeChromosomeToFile(self.bin_chromosome, filename)
             ai.talk('New Chrome File -' + filename)  # Chat the file name
 
     # Checks if the agent has died, if yes and it was killed by another agent
@@ -226,9 +244,7 @@ class CoreAgent():
         # Score change and message with hyphen (indicating killed instead of wall collision)
         if (self.framesPostDeath != 0):
             message: str = ai.scanMsg(0)  # Get most recent chat message
-            serverMessage: str = ai.scanGameMsg(1)  # TODO : Loop through maybe 5-50? most recent
-            print("Server Message: {}".format(serverMessage))
-            print("framesPostDeath: {}".format(self.framesPostDeath))
+
             if "-" in message:  # Hyphen is only in our file messages from other agents
                 self.framesPostDeath = 0
                 print("Message: {}".format(message))
@@ -245,17 +261,10 @@ class CoreAgent():
                         new_chromosome = eval(f.read()) # TODO remove eval
 
                     # Evolution
-                    #print("Transferred Chrome: {}".format(new_chromosome))
-                    cross_over_child = crossover(self.bin_chromosome, new_chromosome)
-                    #print("Crossover child: {}".format(cross_over_child))
-                    mutated_child: List[List] = mutate(cross_over_child, self.MUT_RATE)
-                    #print("Mutated child: {}".format(mutated_child))
-
-                    # Check that the new chromosome is different than old, insanely low odds for it to be the same
-                    # print("*"*50)
-                    #print(mutated_child == chromosome)
-                    # print("*"*50)
-
+                    cross_over_child = Evolver.crossover(self.bin_chromosome, new_chromosome)
+                    print("Crossover_child: {}".format(cross_over_child))
+                    mutated_child: List[List] = Evolver.mutate(cross_over_child, self.MUT_RATE)
+                    print("Mutated_child: {}".format(mutated_child))
                     # Set new chromosome in place of old
                     self.initializeCGA(mutated_child)
 
@@ -453,16 +462,19 @@ class ActionGene():
 
 def loop():
     global agent
+    global bot_num
     if agent is None:
         agent = CoreAgent()
+        agent.agent_id = bot_num
 
-    agent.AI_Loop()
+    #agent.AI_Loop()
 
 
 def main():
-    bot_num: str = sys.argv[1]
+    global bot_num
+    bot_num = sys.argv[1]
 
-    createDataFolder()
+    Evolver.createDataFolder()
     global agent
 
     agent = None
