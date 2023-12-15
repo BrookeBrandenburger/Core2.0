@@ -1,18 +1,17 @@
 import libpyAI as ai
 import math
 import random
-import random
 import os
-from os import path
 import sys
 import traceback
+from typing import Union, List, Any
 
 from chromosome import *
 
 # Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
 
 
-def initializeAgent(input_chrome=generateChromosome()):
+def initializeAgent(input_chrome: List[List] = generateChromosome()) -> None:
     # Chomosome Controllers! #[[loop1], [loop2]]
     global chrome  # Decoded chromosome
     global raw_chrome_values
@@ -36,17 +35,17 @@ def initializeAgent(input_chrome=generateChromosome()):
 # Checks if a kill has been made, if yes -> write it to file and send the file name to chat
 
 
-def earnedKill(ai):
-    global score
+def earnedKill(ai) -> None:
     global prev_score
+    global score
     global chromosome
 
-    filename = "selChrome_0.txt"  # Baseline file name
+    filename: str = "selChrome_0.txt"  # Baseline file name
 
     # Modify file ending for pre-existing files
     while os.path.exists(("data/" + filename)):
         # Get the number at end of file name
-        index = int((filename.split("_")[1]).split(".")[0])
+        index: Union[int, str] = int((filename.split("_")[1]).split(".")[0])
         index = str(index+1)
         filename = "selChrome_{}.txt".format(index)
 
@@ -59,7 +58,7 @@ def earnedKill(ai):
 # finds the chromosome file, and initalizes it as its new chromosome
 
 
-def died(ai):
+def died(ai) -> None:
     global score
     global prev_score
     global chromosome
@@ -82,7 +81,7 @@ def died(ai):
 
     # Score change and message with hyphen (indicating killed instead of wall collision)
     if (framesPostDeath != 0):
-        message = ai.scanMsg(0)  # Get most recent chat message
+        message: str = ai.scanMsg(0)  # Get most recent chat message
 
         if "-" in message:  # Hyphen is only in our file messages from other agents
             framesPostDeath = 0
@@ -93,9 +92,9 @@ def died(ai):
                 # Extract filename from message
                 message = (message.split("-")[1]).split(" ")[0]
                 print("New Chrome filepath: {}".format(message))
-                new_chromosome_file_name = "data/" + message
+                new_chromosome_file_name: str = "data/" + message
 
-                new_chromosome = None
+                new_chromosome: Union[None, List[List]] = None
                 with open(new_chromosome_file_name, 'r') as f:
                     new_chromosome = eval(f.read())
 
@@ -103,7 +102,7 @@ def died(ai):
                 #print("Transferred Chrome: {}".format(new_chromosome))
                 cross_over_child = crossover(chromosome, new_chromosome)
                 #print("Crossover child: {}".format(cross_over_child))
-                mutated_child = mutate(cross_over_child, MUT_RATE)
+                mutated_child: List[List] = mutate(cross_over_child, MUT_RATE)
                 #print("Mutated child: {}".format(mutated_child))
 
                 # Check that the new chromosome is different than old, insanely low odds for it to be the same
@@ -117,13 +116,11 @@ def died(ai):
 # Relative to us
 
 
-def findMinWallAngle(wallFeelers):
-    min_wall = min(wallFeelers)
-    min_index = wallFeelers.index(min_wall)
+def findMinWallAngle(wallFeelers: List[int]) -> int:
+    min_wall: int = min(wallFeelers)
+    min_index: int = wallFeelers.index(min_wall)
 
-    angle = int(10*min_index)
-
-    #angleToEnemy = heading - enemy_angle
+    angle: int = int(10*min_index)
 
     if angle < 180:  # wall to the right
         return angle
@@ -133,13 +130,11 @@ def findMinWallAngle(wallFeelers):
 # Relative to us
 
 
-def findMaxWallAngle(wallFeelers):
-    max_wall = max(wallFeelers)
-    max_index = wallFeelers.index(max_wall)
+def findMaxWallAngle(wallFeelers: List[int]) -> int:
+    max_wall: int = max(wallFeelers)
+    max_index: int = wallFeelers.index(max_wall)
 
-    angle = int(10*max_index)
-
-    #angleToEnemy = heading - enemy_angle
+    angle: int = int(10*max_index)
 
     if angle < 180:  # wall to the right
         return angle
@@ -149,10 +144,11 @@ def findMaxWallAngle(wallFeelers):
 # Relative to world internally, returns relative to us
 
 
-def findAngle(X, Y, ENEMY_X, ENEMY_Y, heading):
-    new_enemy_x = ENEMY_X - X
-    new_enemy_y = ENEMY_Y - Y
+def findAngle(X: int, Y: int, ENEMY_X: int, ENEMY_Y: int, heading: float) -> int:
+    new_enemy_x: int = ENEMY_X - X
+    new_enemy_y: int = ENEMY_Y - Y
 
+    enemy_angle: float
     # If positive, enemy to right
     # If negative, enemy to left
     try:
@@ -160,68 +156,60 @@ def findAngle(X, Y, ENEMY_X, ENEMY_Y, heading):
     except:
         enemy_angle = 0  # in the case of division by 0
 
-    angleToEnemy = int(heading - enemy_angle)
+    angleToEnemy: int = int(heading - enemy_angle)
 
     if angleToEnemy < 360 - angleToEnemy:  # enemy to the right
         return angleToEnemy
     else:
         return angleToEnemy - 360
 
-    #hyp = ENEMY_DIST
-    # if ENEMY_X - X > 0:
-    #    x_dist = ENEMY_X - X
-    # else:
-    #    x_dist = X - ENEMY_X
 
-    #theta = int(math.degrees(math.acos(x_dist / hyp))) - 90
+def checkConditional(conditional_index: int, sensors: list[Any]) -> bool: 
+    speed: float = sensors[0]
+    enemy_dist: Union[float, None] = sensors[1]
+    min_wall_dist: int = sensors[2]
+    closestBulletDistance: float = sensors[3]
+    enemy_x: int = sensors[4]
+    enemy_y: int = sensors[5]
+    x: int = sensors[6]
+    y: int = sensors[7]
+    heading: float = sensors[8]
 
-
-def checkConditional(conditional_index, sensors): 
-    speed = sensors[0]
-    enemy_dist = sensors[1]
-    min_wall_dist = sensors[2]
-    closestBulletDistance = sensors[3]
-    enemy_x = sensors[4]
-    enemy_y = sensors[5]
-    x = sensors[6]
-    y = sensors[7]
-    heading = sensors[8]
-
-    if enemy_dist == None:
+    if enemy_dist is None:
         enemy_dist = -1
         enemy_dir = -1
         enemy_x = -1
         enemy_y = -1
 
-    enemy_dir = getEnemyDirection(enemy_dist, enemy_x, enemy_y, x, y, heading)
+    enemy_dir: int = getEnemyDirection(enemy_dist, enemy_x, enemy_y, x, y, heading)
 
     # 16 conditionals Core 2.0 in Action
-    conditional_list = ["speed > 6", "speed == 0",
-                        "enemy_dist < 50", "enemy_dist > 200",
-                        "enemy_dist < 100 and enemy_dir == 1",
-                        "enemy_dist < 100 and enemy_dir == 2",
-                        # "True",
-                        "enemy_dist < 100 and enemy_dir == 3",
-                        "enemy_dist < 100 and enemy_dir == 4",
-                        "min_wall_dist < 200", "min_wall_dist < 75", "min_wall_dist > 300", "min_wall_dist < 150",
-                        "closestBulletDistance < 100", "closestBulletDistance < 200", "closestBulletDistance <50",
-                        "enemy_dist == -1"
+    conditional_List = [speed > 6, speed == 0,
+                        enemy_dist < 50, enemy_dist > 200,
+                        enemy_dist < 100 and enemy_dir == 1,
+                        enemy_dist < 100 and enemy_dir == 2,
+                        # True,
+                        enemy_dist < 100 and enemy_dir == 3,
+                        enemy_dist < 100 and enemy_dir == 4,
+                        min_wall_dist < 200, min_wall_dist < 75, min_wall_dist > 300, min_wall_dist < 150,
+                        closestBulletDistance < 100, closestBulletDistance < 200, closestBulletDistance <50,
+                        enemy_dist == -1
                         ]
 
-    result = eval(conditional_list[conditional_index])
+    result = conditional_List[conditional_index]
     return result
 
 
-def wallBetweenTarget(X, Y, ENEMY_X, ENEMY_Y):
+def wallBetweenTarget(X: int, Y: int, ENEMY_X: int, ENEMY_Y: int) -> bool:
     return ai.wallBetween(int(X), int(Y), int(ENEMY_X), int(ENEMY_Y)) != -1
 
 
-def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y, heading):
-    direction = -1
+def getEnemyDirection(Enemy_Dist: float, Enemy_X: int, Enemy_Y: int, X: int, Y: int, heading: float) -> int:
+    direction: int = -1
 
-    theta = None
-    wallPreEnemy = False
-    shotTolerance = random.randint(-5, 5)
+    theta: Union[float, None] = None
+    wallPreEnemy: Union[bool, None] = False
+    shotTolerance: int = random.randint(-5, 5)
 
     if Enemy_Dist != -1:
         xDistToEnemy = Enemy_X - X
@@ -248,33 +236,26 @@ def getEnemyDirection(Enemy_Dist, Enemy_X, Enemy_Y, X, Y, heading):
 def AI_loop():
     try:
         ai.setPower(8)
-        #speed = sensors[0]
-        #enemy_dist = sensors[1]
-        # min_wall_dist= sensors[2] # minimum wall distance
-        #closestBulletDistance = sensors[3]
-        #enemy_x = sensors[4]
-        #enemy_y = sensors[5]
-        #x = sensors[6]
-        #y = sensors[7]
+        ai.setTurnSpeed(20.0)
 
         # Self details
         # handicap
-        speed = int(ai.selfSpeed())
-        X = int(ai.selfX())
-        Y = int(ai.selfY())
+        speed: int = int(ai.selfSpeed())
+        X: int = int(ai.selfX())
+        Y: int = int(ai.selfY())
 
         # get information
-        heading = int(ai.selfHeadingDeg())
-        tracking = int(ai.selfTrackingDeg())
+        heading: int = int(ai.selfHeadingDeg())
+        tracking: int = int(ai.selfTrackingDeg())
 
         # Enemy Details
-        closestShipId = int(ai.closestShipId())
+        closestShipId: int = int(ai.closestShipId())
 
-        ENEMY_SPEED = None
-        ENEMY_DIST = None
-        ENEMY_X = None
-        ENEMY_Y = None
-        ENEMY_HEADING = None
+        ENEMY_SPEED: Union[float, None] = None
+        ENEMY_DIST: Union[float, None] = None
+        ENEMY_X: Union[int, None] = None
+        ENEMY_Y: Union[int, None] = None
+        ENEMY_HEADING: Union[float, None] = None
 
         if closestShipId != -1:
             ENEMY_SPEED = float(ai.enemySpeedId(closestShipId))
@@ -284,13 +265,13 @@ def AI_loop():
             ENEMY_HEADING = float(ai.enemyHeadingDegId(closestShipId))
 
         if ai.shotDist(0) > 0:
-            closestBulletDistance = ai.shotDist(0)
+            closestBulletDistance: float = ai.shotDist(0)
         else:
             closestBulletDistance = math.inf
 
         # store in array so we can easily find the shortest feeler
         #trackingFeelers = []
-        headingFeelers = []
+        headingFeelers: list[int] = []
 
         # Tracking
         # for angle in range(0, 360, 10):
@@ -300,7 +281,7 @@ def AI_loop():
         for angle in range(0, 360, 10):
             headingFeelers.append(ai.wallFeeler(500, heading + angle))
 
-        min_wall_dist = min(headingFeelers)
+        min_wall_dist: int = min(headingFeelers)
 
         # Disable turns by default each loop
         # ai.turnRight(0)
@@ -312,7 +293,7 @@ def AI_loop():
         global current_gene_idx
         global chromosome
 
-        GENES_PER_LOOP = 8
+        GENES_PER_LOOP: int = 8
 
         #print("Chrome: {}".format(chrome))
         #print("Raw chrome values: {}".format(raw_chrome_values))
@@ -321,7 +302,7 @@ def AI_loop():
         #print("Current Gene index: {}".format(current_gene_idx))
         #print("Current Loop Index: {}".format(current_loop_idx))
         # print("-"*10)
-        sensors = [speed, ENEMY_DIST, min_wall_dist,
+        sensors: list[Any] = [speed, ENEMY_DIST, min_wall_dist,
                    closestBulletDistance, ENEMY_X, ENEMY_Y, X, Y, heading]
 
         # If current gene is a jump gene
@@ -344,12 +325,12 @@ def AI_loop():
                 current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP)
         else:
             # Convert from boolean to 1 or 0 for x-pilot inputs
-            shoot = current_loop[current_gene_idx][1]
-            thrust = 1 if current_loop[current_gene_idx][2] else 0
+            shoot: bool = current_loop[current_gene_idx][1]
+            thrust: int = 1 if current_loop[current_gene_idx][2] else 0
 
-            turnQuantity = int(
+            turnQuantity: int = int(
                 (current_loop[current_gene_idx][3]) * 10)  # Scale up
-            turnTarget = current_loop[current_gene_idx][4]
+            turnTarget: int = current_loop[current_gene_idx][4]
 
             #print("Action Gene:")
             #print("Shoot: {}".format(shoot))
@@ -366,7 +347,7 @@ def AI_loop():
             match turnTarget:
                 case 0:
                     # turn towards closest wall heading
-                    angle = findMinWallAngle(headingFeelers)
+                    angle: int = findMinWallAngle(headingFeelers)
 
                     if angle < 0:
                         ai.turn(-1*turnQuantity)
@@ -374,7 +355,7 @@ def AI_loop():
                         ai.turn(turnQuantity)
                 case 1:
                     # turn away from closest wall heading
-                    angle = findMinWallAngle(headingFeelers)
+                    angle: int = findMinWallAngle(headingFeelers)
 
                     if angle > 0:
                         ai.turn(-1*turnQuantity)
@@ -382,7 +363,7 @@ def AI_loop():
                         ai.turn(turnQuantity)
                 case 2:
                     # turn towards furthest wall heading
-                    angle = findMaxWallAngle(headingFeelers)
+                    angle: int = findMaxWallAngle(headingFeelers)
 
                     if angle < 0:
                         ai.turn(-1*turnQuantity)
@@ -390,7 +371,7 @@ def AI_loop():
                         ai.turn(turnQuantity)
                 case 3:
                     # turn away from furthest wall heading
-                    angle = findMaxWallAngle(headingFeelers)
+                    angle: int = findMaxWallAngle(headingFeelers)
 
                     if angle > 0:
                         ai.turn(-1*turnQuantity)
@@ -399,7 +380,7 @@ def AI_loop():
                 case 4:
                     # turn towards enemy ship
                     if ENEMY_DIST != None:
-                        angleToEnemy = findAngle(
+                        angleToEnemy: int = findAngle(
                             X, Y, ENEMY_X, ENEMY_Y, heading)
 
                         if angleToEnemy < 0:
@@ -410,7 +391,7 @@ def AI_loop():
                 case 5:
                     # turn away from enemy ship
                     if ENEMY_DIST != None:
-                        angleToEnemy = findAngle(
+                        angleToEnemy: int = findAngle(
                             X, Y, ENEMY_X, ENEMY_Y, heading)
 
                         if angleToEnemy > 0:
@@ -421,9 +402,9 @@ def AI_loop():
                 case 6:
                     # turn towards bullet
                     if ai.shotDist(0) != -1:
-                        SHOT_X = ai.shotX(0)
-                        SHOT_Y = ai.shotY(0)
-                        angleToShot = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
+                        SHOT_X: int = ai.shotX(0)
+                        SHOT_Y: int = ai.shotY(0)
+                        angleToShot: int = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
 
                         if angleToShot < 0:
                             ai.turn(-1*turnQuantity)
@@ -433,9 +414,9 @@ def AI_loop():
                 case 7:
                     # turn away from bullet
                     if ai.shotDist(0) != -1:
-                        SHOT_X = ai.shotX(0)
-                        SHOT_Y = ai.shotY(0)
-                        angleToShot = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
+                        SHOT_X: int = ai.shotX(0)
+                        SHOT_Y: int = ai.shotY(0)
+                        angleToShot: int = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
 
                         if angleToShot > 0:
                             ai.turn(-1*turnQuantity)
@@ -469,8 +450,7 @@ def AI_loop():
 
 
 def main():
-    args = sys.argv
-    bot_num = sys.argv[1]
+    bot_num: str = sys.argv[1]
 
     createDataFolder()
 
