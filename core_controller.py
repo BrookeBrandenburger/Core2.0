@@ -445,7 +445,7 @@ class ActionGene():
 
     def act(self) -> None:
         ai.thrust(self.thrust)
-        ai.fireShot if self.shoot else None
+        ai.fireShot() if self.shoot else None
         self.turn()
 
 
