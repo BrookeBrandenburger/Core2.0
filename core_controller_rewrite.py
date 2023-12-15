@@ -56,6 +56,9 @@ class CoreAgent():
 
         # Bullet Data
         self.closest_bullet_distance: float = -1
+        self.shot_x: int = -1
+        self.shot_y: int = -1
+        self.angle_to_shot: int = -1
 
         self.initializeCGA()
         self.generateFeelers(10)
@@ -70,16 +73,19 @@ class CoreAgent():
             self.updateScore()
 
             gene: List[Any] = self.current_loop[self.current_gene_idx]
+            print("Gene: {}".format(gene))
             if self.isJumpGene(gene):   # If gene is a jump gene
                 if self.checkConditional(gene[1]):  # If the conditional is true
                     # Jump
                     self.current_loop_idx = gene[2]
                     self.current_loop = self.dec_chromosome[self.current_loop_idx]
                     self.current_gene_idx = 0
+    
                     # TODO : Make this check repeat so we always execute an action in any given frame
                     return  # End current iteration to start at new cycle
                 else: # The conditional is not true
                     self.incrementGeneIndex()
+            gene = self.current_loop[self.current_gene_idx]
 
             # Action gene
             ActionGene(gene, self)
@@ -94,7 +100,6 @@ class CoreAgent():
             traceback.print_exc()
             ai.quitAI()
 
-
         #print(self.score)
         #print(self.X)
         #print(self.Y)
@@ -106,7 +111,7 @@ class CoreAgent():
 
     # Returns true if a gene is jump gene
     def isJumpGene(self, gene: List[Any]) -> bool:
-        print(gene)
+        #print(gene)
         return gene[0] == False
 
     def updateScore(self) -> None:
@@ -154,6 +159,9 @@ class CoreAgent():
 
         else:
             self.closest_bullet_distance = -1
+            self.shot_x = -1
+            self.shot_y = -1
+            self.angle_to_shot = -1
 
     # Create all needed wall feelers for the AI
     def generateFeelers(self, step: int) -> None: 
@@ -175,13 +183,12 @@ class CoreAgent():
         self.bin_chromosome = input_chrome
         self.dec_chromosome = readChrome(self.bin_chromosome)
 
-        print("Chromosome: {}".format(self.dec_chromosome))
+        print("Chromosome: {}".format(self.bin_chromosome))
 
         # Reset place in chromosome
         self.current_loop_idx = 0  # Current Loop Number
         self.current_loop = self.dec_chromosome[0]
         self.current_gene_idx = 0  # Current gene Number within a given loop
-
 
     # Checks if a kill has been made, if yes -> write it to file and send the file name to chat
 
@@ -300,7 +307,6 @@ class CoreAgent():
         else:
             return angleToEnemy - 360
 
-
     def checkConditional(self, conditional_index: int) -> bool: 
         min_wall_dist: int = min(self.headingFeelers)
 
@@ -350,9 +356,11 @@ class CoreAgent():
 
         return direction
 
+
 class ActionGene():
     def __init__(self, gene: List[Any], agent: CoreAgent) -> None:
         if gene[0] == False:  # Indicates jump gene
+            print(gene)
             print("Unexpected action gene found")
             return None
 
@@ -441,171 +449,13 @@ class ActionGene():
         self.turn()
 
 
-
-#def AI_loop():
-    #try:
-        
-        #print("Chrome: {}".format(chrome))
-        #print("Raw chrome values: {}".format(raw_chrome_values))
-        #print("Current gene: {}".format(current_loop))
-        #print("Current loop: {}".format(current_loop[current_gene_idx]))
-        #print("Current Gene index: {}".format(current_gene_idx))
-        #print("Current Loop Index: {}".format(current_loop_idx))
-        # print("-"*10)
-
-        #sensors: list[Any] = [speed, ENEMY_DIST, min_wall_dist,
-        #           closestBulletDistance, enemy_x, enemy_y, X, Y, heading]
-
-        # If current gene is a jump gene
-        # First item in gene being false indicates jump gene
-        # if current_loop[current_gene_idx][0] == False:
-
-        #     # If the Jump Gene conditional is true
-        #     checkConditionalResult = checkConditional(
-        #         current_loop[current_gene_idx][1], sensors)
-        #     if checkConditionalResult:
-        #         # Update to the gene determined by jump
-        #         current_loop_idx = current_loop[current_gene_idx][2]
-        #         # Set new current gene based on the index
-        #         current_loop = chrome[current_loop_idx]
-        #         current_gene_idx = 0  # Reset loop index to 0 for the new gene
-
-        #         #print("Jumping to: {}".format(current_loop_idx))
-        #     else:
-        #         # Move to next loop in the gene (max 15)
-        #         current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP)
-        # else:
-        #     # Convert from boolean to 1 or 0 for x-pilot inputs
-        #     shoot: bool = current_loop[current_gene_idx][1]
-        #     thrust: int = 1 if current_loop[current_gene_idx][2] else 0
-
-        #     turnQuantity: int = int(
-        #         (current_loop[current_gene_idx][3]) * 10)  # Scale up
-        #     turnTarget: int = current_loop[current_gene_idx][4]
-
-            #print("Action Gene:")
-            #print("Shoot: {}".format(shoot))
-            #print("Thrust: {}".format(thrust))
-            #print("Turn Quantity: {}".format(turnQuantity))
-            #print("Turn Target Num: {}".format(turnTarget))
-            # print("-"*40)
-
-            # ai.thrust(thrust)
-            # ai.fireShot() if shoot else None  # ai.fireShot(shoot) # Shoot if shoot is true
-
-            # # Pick turn target based on numerical identifier from loop.
-            # # Examples from paper: nearestShip, oppsoiteClosestWall, most dangerous bullet etc
-            # match turnTarget:
-            #     case 0:
-            #         # turn towards closest wall heading
-            #         angle: int = findMinWallAngle(headingFeelers)
-
-            #         if angle < 0:
-            #             ai.turn(-1*turnQuantity)
-            #         elif angle > 0:
-            #             ai.turn(turnQuantity)
-            #     case 1:
-            #         # turn away from closest wall heading
-            #         angle: int = findMinWallAngle(headingFeelers)
-
-            #         if angle > 0:
-            #             ai.turn(-1*turnQuantity)
-            #         elif angle < 0:
-            #             ai.turn(turnQuantity)
-            #     case 2:
-            #         # turn towards furthest wall heading
-            #         angle: int = findMaxWallAngle(headingFeelers)
-
-            #         if angle < 0:
-            #             ai.turn(-1*turnQuantity)
-            #         elif angle > 0:
-            #             ai.turn(turnQuantity)
-            #     case 3:
-            #         # turn away from furthest wall heading
-            #         angle: int = findMaxWallAngle(headingFeelers)
-
-            #         if angle > 0:
-            #             ai.turn(-1*turnQuantity)
-            #         elif angle < 0:
-            #             ai.turn(turnQuantity)
-            #     case 4:
-            #         # turn towards enemy ship
-            #         if ENEMY_DIST != None:
-            #             angleToEnemy: int = findAngle(
-            #                 X, Y, enemy_x, enemy_y, heading)
-
-            #             if angleToEnemy < 0:
-            #                 ai.turn(-1*turnQuantity)
-            #             elif angleToEnemy > 0:
-            #                 ai.turn(turnQuantity)
-
-            #     case 5:
-            #         # turn away from enemy ship
-            #         if ENEMY_DIST != None:
-            #             angleToEnemy: int = findAngle(
-            #                 X, Y, enemy_x, enemy_y, heading)
-
-            #             if angleToEnemy > 0:
-            #                 ai.turn(-1*turnQuantity)
-            #             else:
-            #                 ai.turn(turnQuantity)
-
-            #     case 6:
-            #         # turn towards bullet
-            #         if ai.shotDist(0) != -1:
-            #             SHOT_X: int = ai.shotX(0)
-            #             SHOT_Y: int = ai.shotY(0)
-            #             angleToShot: int = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
-
-            #             if angleToShot < 0:
-            #                 ai.turn(-1*turnQuantity)
-            #             elif angleToShot > 0:
-            #                 ai.turn(turnQuantity)
-
-            #     case 7:
-            #         # turn away from bullet
-            #         if ai.shotDist(0) != -1:
-            #             SHOT_X: int = ai.shotX(0)
-            #             SHOT_Y: int = ai.shotY(0)
-            #             angleToShot: int = findAngle(X, Y, SHOT_X, SHOT_Y, heading)
-
-            #             if angleToShot > 0:
-            #                 ai.turn(-1*turnQuantity)
-            #             elif angleToShot < 0:
-            #                 ai.turn(turnQuantity)
-
-        #     # Move to next loop in the gene (max 15)
-        #     current_gene_idx = ((current_gene_idx + 1) % GENES_PER_LOOP)
-
-        # # print("-"*20)
-
-        # # Kill/Death Tracking
-        # global score
-        # global prev_score
-
-        # earnedKill(ai)
-        # died(ai)
-        # prev_score = score
-        # score = ai.selfScore()
-
-        # #print("Main Loop Score: {}".format(score))
-        #print("Main Loop Prev_Score: {}".format(score))
-
-        # NOTE: Do we want to crossover with a random new chroomsome if we crash ourselves?
-
-    # except Exception as e:
-    #     print("Exception")
-    #     print(str(e))
-    #     traceback.print_exc()
-    #     ai.quitAI()
-
-
 def loop():
     global agent
     if agent is None:
         agent = CoreAgent()
 
     agent.AI_Loop()
+
 
 def main():
     bot_num: str = sys.argv[1]
