@@ -124,18 +124,25 @@ class Evolver():
         # Gene Size 9 bits
         # Loop size including conditional 8
         chromosome = []
-        for loop in range(16):
+        for loopIndex in range(16):
             loop = []
             for i in range(8):  # 8 genes per loop
                 gene = ""
                 for j in range(9):  # gene size
-                    if i == 0 and j==0:
+                    # Jump gene construction
+                    if i == 0 and j==0: # i== 0 is first gene, j ==0 is first bit
                         gene += "1"
                     elif j == 0 :
                         gene += "0"
-                    else:
+                    elif i == 0 and j == 1:
+                        gene += format(loopIndex, '04b') # 4 bit 0 padding
+                    elif i == 0 and j > 4:
                         gene += str(random.randint(0, 1))
+                    elif i > 0: # Target number for jump gene
+                        gene += str(random.randint(0, 1))
+                #print(gene)
                 loop.append(gene)
+            #print(loop[0])
             chromosome.append(loop)
         # print(chromosome)
         return chromosome
