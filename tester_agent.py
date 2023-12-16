@@ -121,11 +121,9 @@ class CoreAgent():
                 gene = self.current_loop[self.current_gene_idx]
 
                 # Action gene
-                #ActionGene(gene, self)
+                ActionGene(gene, self)
                 self.incrementGeneIndex()
 
-            #self.earnedKill()
-            #self.died()
             else:  # Dead
                 self.processServerFeed()
                 self.frames_dead += 1
@@ -522,9 +520,8 @@ def loop():
 
 def main():
     global bot_name
-    bot_name = "H_Agent_{}".format(sys.argv[1])
+    bot_name = "Core_Agent_{}".format(sys.argv[1])
 
-    #Evolver.createDataFolder()
     global agent
 
     agent = None
