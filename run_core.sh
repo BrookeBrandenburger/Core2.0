@@ -5,7 +5,7 @@ echo "Starting Xpilots Server"
 # switchBase 1 = 100% probability to swap bases on death, + teams disables teams
 gnome-terminal -- python3 reset_cga_storage.py 
 echo "Reset data and tracebacks folder"
-gnome-terminal -- ./xpilots -map simple.xp -noquit -switchBase 1.0 +teams -maxRoundTime 60 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 10    
+gnome-terminal -- ./xpilots -map simple.xp -noquit -switchBase 1.0 +teams -maxRoundTime 60 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 32    
 sleep 2
 # Set the number of instances you want to run
 num_instances=5
