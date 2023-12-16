@@ -245,7 +245,7 @@ class CoreAgent():
                 victim = message.split(" was")[0]
                 killer = message.split("from ")[-1][:-1]  # remove period from end
                 break
-            elif "smashed" in message:
+            elif "smashed" in message or "trashed" in message:
                 #  print("Self destructed")
                 self.last_death = [killer,  victim]
                 return
