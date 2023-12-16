@@ -61,7 +61,7 @@ class CoreAgent():
         self.shot_y: int = -1
         self.angle_to_shot: int = -1
 
-        self.createTracebackFolder()
+        #self.createTracebackFolder()
         self.initializeCGA()
         self.generateFeelers(10)
         print("Alive!")
@@ -474,7 +474,7 @@ def main():
     global bot_num
     bot_num = sys.argv[1]
 
-    Evolver.createDataFolder()
+    #Evolver.createDataFolder()
     global agent
 
     agent = None

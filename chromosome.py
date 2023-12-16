@@ -207,4 +207,5 @@ class Evolver():
             pass
 
         os.mkdir("data/")
+        print("Reset data folder")
 
