@@ -37,6 +37,7 @@ class CoreAgent():
         self.bin_chromosome: Optional[List[List[str]]] = None  # Binary chromosome, originally called chromosome or raw_chrome_values
         self.dec_chromosome: Optional[List[List[Any]]] = None  #Decoded chromosome 
         self.current_loop: Optional[List[List]] = None  # Current loop in the chromosome 
+        self.chromosome_iteration: int = 0
 
         # Genetic Indices
         self.current_loop_idx: int = 0
@@ -209,6 +210,8 @@ class CoreAgent():
     # Sets all needed values for a new agent, by default creates a new chromosome, a chromosome can be passed in.
 
     def initializeCGA(self, input_chrome: List[List[str]] = Evolver.generateChromosome()) -> None:
+        self.chromosome_iteration += 1
+
         self.bin_chromosome = input_chrome
         self.dec_chromosome = Evolver.readChrome(self.bin_chromosome)
 
@@ -223,6 +226,7 @@ class CoreAgent():
         self.current_loop = self.dec_chromosome[0]
         self.current_gene_idx = 0  # Current gene Number within a given loop
         Evolver.writeChromosomeToFile(self.bin_chromosome, "{}.txt".format(self.bot_name))  # noqa: E501
+        Evolver.logChromeosomeHistory(self.bin_chromosome, self.chromosome_iteration, "{}_history.txt".format(self.bot_name))
 
     # Checks if a kill has been made, if yes -> write it to file and send the file name to chat
 

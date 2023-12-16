@@ -196,6 +196,14 @@ class Evolver():
             # for gene in loop:
             file.write(str(chromosome))
 
+    @classmethod
+    def logChromeosomeHistory(cls, chromosome, chrome_number, filename):
+        dataPath = "data/chromosome_logs/" + filename
+
+        with open(dataPath, "a") as f:
+            f.write("Iteration {}: {} \n".format(chrome_number, chromosome)) 
+
+
     # Wipes data folder for each new run of core_controller
 
     @classmethod
@@ -207,5 +215,6 @@ class Evolver():
             pass
 
         os.mkdir("data/")
+        os.mkdir("data/chromosome_logs/")
         print("Reset data folder")
 
