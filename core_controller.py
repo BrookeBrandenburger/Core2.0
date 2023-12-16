@@ -236,24 +236,19 @@ class CoreAgent():
             if self.bot_name in serverMessage and "ratio" not in serverMessage and "crashed" not in serverMessage and "entered" not in serverMessage:
                 self.feed_history.append(serverMessage)
 
-        #print(self.feed_history)
         killer = "null"
         victim = "null"
-        #print(self.feed_history)
         for message in self.feed_history:
             if "killed" in message:
                 victim = message.split(" was")[0]
                 killer = message.split("from ")[-1][:-1]  # remove period from end
                 break
             elif "smashed" in message or "trashed" in message:
-                #  print("Self destructed")
                 self.last_death = [killer,  victim]
                 return
 
         # reset to nones on ai.self alive is false
         output = [killer, victim]
-        #if "null" not in output:
-        #    print(output)
         if killer == self.bot_name:
             self.last_kill = output
         elif victim == self.bot_name:
