@@ -334,10 +334,10 @@ class CoreAgent():
         min_wall_dist: int = min(self.headingFeelers)
 
         # 16 conditionals Core 2.0 in Action
-        conditional_List = [self.speed > 6, self.speed == 0,
-                            self.enemy_dist < 50, self.enemy_dist > 200,
-                            self.enemy_dist < 100 and self.enemy_dir == 1,
-                            self.enemy_dist < 100 and self.enemy_dir == 2,
+        conditional_List = [self.speed < 6, self.speed == 0,
+                            self.enemy_dist < 50, self.headingFeelers[0] < 100,
+                            self.enemy_dist < 150 and self.enemy_dir == 1,
+                            self.enemy_dist < 150 and self.enemy_dir == 2,
                             # True,
                             self.enemy_dist < 100 and self.enemy_dir == 3,
                             self.enemy_dist < 100 and self.enemy_dir == 4,
