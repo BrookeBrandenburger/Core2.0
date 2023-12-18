@@ -1,0 +1,104 @@
+With three programmers coding in different styles we wanted to increase the clarity by including a high-level overview, to illustrate how to run the code and what the code is doing with out being bogged down by the semantics. We also included instructions for an outsider to run:
+
+Melanie, Brooke, and Aaron
+
+CoreAgent Class: 
+
+//sets up settings and parameters for XPilot and GA
+	Initializes various properties such as mutation rate, genes per loop, and the bot's name.
+	Sets initial positional and heading values.
+	Configures X-Pilot settings.
+	Initializes genetic data, score data, enemy data, and bullet data.
+	Calls the initializeCGA method to set up the agent with a new chromosome.  //allows implementation of our GA to agents 
+
+//what is being loaded at every Framerate of the game
+AI Loop:
+
+	The AI_Loop method is the main loop of the agent.
+	Check if the agent is alive and update data accordingly.
+	Handles the genetic evolution process using the Evolver class.
+	Executes action genes based on the current gene index and loop.
+	Helper Methods
+		Various methods for updating agent data, enemy data, and bullet data.
+		Methods for generating feelers and updating the score.
+		Methods for handling server feed and determining if the agent was killed.
+	Genetic Operations
+		Methods for incrementing the gene index and updating the score.
+		Initializes the chromosome and handles the crossover process.
+	Other
+		Methods for finding wall angles, calculating angles, and checking conditionals.
+	ActionGene Class
+		Initialization //causes a robot to learn what actions are needed according to chromosomes
+		Initializes properties based on the provided gene and the parent agent.
+	Action Execution //causes robot to perform actions
+		Executes actions based on the gene's parameters, such as shooting, thrusting, and turning.
+		Uses the turn method to determine the turn behavior based on the specified turn target. //I.e. ship, wall, bullet, other entities
+	Main Functionality
+		The loop function is the main entry point for the AI loop, and it initializes the CoreAgent instance.
+		The main function sets up the bot's name, initializes the agent, and starts the game loop using the ai.start function.
+
+
+Running the Agent
+
+python bot_name.py 1
+- The script can be run from the command line, providing a unique bot name as a command-line argument
+-  Ensure that the "data" folder and "data/chromosome_logs" subfolder are present in the same directory as the script for proper functioning.
+- file run_core.py will also set up the game
+
+
+Information about the background classes that enable the program to learn and coevolve
+The agent's behavior is encoded in chromosomes, consisting of loops and genes. Below is an overview of key concepts and functionalities:
+
+Chromosome Structure
+	The chromosome consists of 16 loops, each containing 8 genes.
+	Each gene is a 9-bit representation of a jump or action.
+	The first bit of a gene identifies whether it is a jump gene (1) or an action gene (0).
+	Each loop starts with a jump gene
+	Jump genes have conditional information and loop number, while action genes have shoot,	thrust, turn quantity, and turn target.
+
+
+Evolutionary Operations. //used by the CGA when producing a coevolved offspring
+
+	Crossover (crossover method):
+
+		Implements single-point crossover or uniform crossover based on a random chance.
+		Combines genes from two parent chromosomes to create a new child chromosome.
+		Handles overlaying the original jump/conditional values. //prevents mutation of the frozen first bit and the jump genes conditional part
+
+	Mutation (mutate method):
+
+		Mutates genes in a chromosome based on a mutation rate.
+		Flip bits to introduce variations in the chromosome.
+
+Chromosome Interpretation //dissects the chromosome to give processable instructions to control the agent
+
+isJumpGene method:
+
+	Returns True if a given gene is a jump gene.
+
+readChrome method:
+
+	Interprets a raw chromosome into a more readable format.
+	Converts binary representation to specific parameters for conditional jumps and action genes.
+
+Chromosome Generation
+	generateChromosome method: //used for the initial population
+		Generates a random initial chromosome.
+
+File Operations //has to save chromosomes to ill to evolve correctly and have other agents reference
+
+	writeChromosomeToFile method:
+
+		Writes a chromosome to a file in the "data" directory.
+	
+	logChromeosomeHistory method:
+
+		Logs chromosome history for analysis in the "data/chromosome_logs" directory.
+
+Data Folder Management
+	createDataFolder method:
+		Clears and resets the "data" folder for a new run.
+
+Usage
+**intended to be part of a larger system
+
