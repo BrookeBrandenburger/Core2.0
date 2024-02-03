@@ -1,23 +1,23 @@
 #!/bin/bash
 
 # Start Server
-echo "Starting Xpilots Server"
+echo "Starting Xpilots Server";
 # switchBase 1 = 100% probability to swap bases on death, + teams disables teams
-gnome-terminal -- python3 reset_cga_storage.py 
-echo "Reset data and tracebacks folder"
-gnome-terminal -- ./xpilots -map simple.xp -noquit -switchBase 1.0 +teams -maxRoundTime 60 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 32    
-sleep 2
+python3 reset_cga_storage.py;
+echo "Reset data and tracebacks folder";
+./xpilots -map simple.xp -noquit -switchBase 1.0 +teams -maxRoundTime 60 -roundsToPlay 0 -resetOnHuman 1 -limitedLives -maxClientsPerIP 32 &
+sleep 2;
 # Set the number of instances you want to run
-num_instances=6
+num_instances=6;
 
 # Loop to run multiple instances
 for ((i=1; i<=$num_instances; i++)); do
     echo "Running instance $i"
-    gnome-terminal -- python3 core_controller.py "$i" &
-    sleep 1  # Optional: Add a small delay between instances if needed
+    python3 core_controller.py "$i" &
+    wait 1
 done
 
 # Wait for all instances to finish
-wait
+wait;
 
-echo "All $num_instances instances have been started."
+echo "All $num_instances instances have been started.";
